@@ -16,13 +16,17 @@ namespace BarbosinaStory
     //  
     // Что делает патч (только для сценария BarbosinaStory_Crash):  
     //  - для слотов 0..5 ставит имя, пол, возраст, черты, навыки, страсти, биографии;  
-    //  - все 12 навыков задаются явно (неуказанные = 0, страсть None),  
-    //    поэтому рероль не меняет статы;  
+    //  - все 12 навыков задаются явно, поэтому рероль не меняет статы;  
+    //  - у каждого навыка минимум мелкий огонёк (Minor), у профильных - Major;  
     //  - возраст случайный 19..30 лет;  
     //  - всем шестерым принудительно ставит мужской пол и чинит тело/голову;  
     //  - чистит все случайные родственные и социальные связи;  
     //  - Фостера (слот 1) и Акаси (слот 2) делает геями и любовниками;  
     //  - после правок сбрасывает графику и портрет, чтобы превью не было пустым.  
+    //  
+    // Отдельный патч на Page_ConfigureStartingPawns.PreOpen сразу перегенерит  
+    // все шесть слотов при открытии редактора, чтобы не приходилось вручную  
+    // жать "случайно".  
     // ============================================================  
 
     [StaticConstructorOnStartup]
@@ -45,7 +49,7 @@ namespace BarbosinaStory
         public string adultBackstoryDefName;
         public List<(string traitDefName, int degree)> traits;
         public Dictionary<string, int> skillLevels; // ключ — defName SkillDef, значение 0..20  
-        public Dictionary<string, Passion> passions;
+        public Dictionary<string, Passion> passions; // только МАЖОРНЫЕ; остальным даётся Minor  
 
         public BarbosinaCharacterPreset(string first, string nick, string last,
             string childBs, string adultBs,
@@ -74,6 +78,8 @@ namespace BarbosinaStory
         public const int MaxAge = 30;
 
         // Индекс в списке = индекс стартового слота (0..5).  
+        // Навыки заданы по всем 12 скиллам. В словаре passions перечислены  
+        // только МАЖОРНЫЕ навыки, всем остальным патч ставит Minor.  
         public static readonly List<BarbosinaCharacterPreset> Characters = new List<BarbosinaCharacterPreset>
         {  
             // 0: Кумар — Кумаростан. Слабак, но фермер: тянет растения.  
@@ -82,9 +88,11 @@ namespace BarbosinaStory
                 "BB_KumarChild", "BB_KumarAdult",
                 new List<(string, int)> { ("Wimp", 0), ("Nerves", -1) },
                 new Dictionary<string, int> {
-                    {"Plants", 7}, {"Animals", 4}, {"Social", 4}, {"Cooking", 3}
+                    {"Shooting", 2}, {"Melee", 1}, {"Construction", 2}, {"Mining", 2},
+                    {"Cooking", 4}, {"Plants", 7}, {"Animals", 4}, {"Crafting", 3},
+                    {"Artistic", 2}, {"Medicine", 3}, {"Social", 4}, {"Intellectual", 4}
                 },
-                new Dictionary<string, Passion> { {"Plants", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Plants", Passion.Major} }
             ),  
   
             // 1: Фостер — Солнечное королевство. Слабак, но дрессировщик и художник.  
@@ -93,9 +101,11 @@ namespace BarbosinaStory
                 "BB_FosterChild", "BB_FosterAdult",
                 new List<(string, int)> { ("Gay", 0), ("NaturalMood", 2), ("Beauty", 1) },
                 new Dictionary<string, int> {
-                    {"Animals", 6}, {"Artistic", 6}, {"Social", 6}
+                    {"Shooting", 3}, {"Melee", 3}, {"Construction", 2}, {"Mining", 2},
+                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 6}, {"Crafting", 3},
+                    {"Artistic", 6}, {"Medicine", 2}, {"Social", 6}, {"Intellectual", 1}
                 },
-                new Dictionary<string, Passion> { {"Animals", Passion.Minor}, {"Artistic", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Animals", Passion.Major}, {"Artistic", Passion.Major} }
             ),  
   
             // 2: Акаси — апостол и любовник Фостера. Слабак, но доктор.  
@@ -104,9 +114,11 @@ namespace BarbosinaStory
                 "BB_AkasiChild", "BB_AkasiAdult",
                 new List<(string, int)> { ("Gay", 0), ("Nerves", 2) },
                 new Dictionary<string, int> {
-                    {"Medicine", 7}, {"Social", 4}, {"Intellectual", 3}, {"Plants", 3}
+                    {"Shooting", 2}, {"Melee", 2}, {"Construction", 2}, {"Mining", 2},
+                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 3},
+                    {"Artistic", 3}, {"Medicine", 7}, {"Social", 4}, {"Intellectual", 4}
                 },
-                new Dictionary<string, Passion> { {"Medicine", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Medicine", Passion.Major} }
             ),  
   
             // 3: Барбос/Барсик — Барсеговина. Боевой универсал, средние статки.  
@@ -115,9 +127,11 @@ namespace BarbosinaStory
                 "BB_BarbosChild", "BB_BarbosAdult",
                 new List<(string, int)> { ("Nerves", 1), ("Industriousness", 1) },
                 new Dictionary<string, int> {
-                    {"Shooting", 7}, {"Melee", 5}, {"Social", 7}, {"Construction", 6}, {"Mining", 4}, {"Intellectual", 5}
+                    {"Shooting", 7}, {"Melee", 5}, {"Construction", 6}, {"Mining", 4},
+                    {"Cooking", 4}, {"Plants", 4}, {"Animals", 4}, {"Crafting", 5},
+                    {"Artistic", 3}, {"Medicine", 4}, {"Social", 7}, {"Intellectual", 5}
                 },
-                new Dictionary<string, Passion> { {"Shooting", Passion.Major}, {"Construction", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Shooting", Passion.Major} }
             ),  
   
             // 4: Киткат — Respectable. Боец + мозг, рукастый.  
@@ -126,20 +140,24 @@ namespace BarbosinaStory
                 "BB_KitkatChild", "BB_KitkatAdult",
                 new List<(string, int)> { ("Undergrounder", 0), ("NaturalMood", 1) },
                 new Dictionary<string, int> {
-                    {"Intellectual", 7}, {"Social", 8}, {"Artistic", 6}, {"Crafting", 5}, {"Shooting", 4}
+                    {"Shooting", 4}, {"Melee", 3}, {"Construction", 4}, {"Mining", 4},
+                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 5},
+                    {"Artistic", 6}, {"Medicine", 4}, {"Social", 8}, {"Intellectual", 7}
                 },
-                new Dictionary<string, Passion> { {"Intellectual", Passion.Major}, {"Social", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Intellectual", Passion.Major}, {"Social", Passion.Major} }
             ),  
   
-            // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель и ремесло, умный, соц вернули.  
+            // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель и ремесло, умный.  
             new BarbosinaCharacterPreset(
                 "Хмурый", "muederatte", "Хмуростан",
                 "BB_HmuryChild", "BB_HmuryAdult",
                 new List<(string, int)> { ("NaturalMood", -2), ("Industriousness", 2) },
                 new Dictionary<string, int> {
-                    {"Construction", 9}, {"Crafting", 7}, {"Mining", 7}, {"Intellectual", 7}, {"Shooting", 5}, {"Social", 4}
+                    {"Shooting", 5}, {"Melee", 4}, {"Construction", 9}, {"Mining", 7},
+                    {"Cooking", 3}, {"Plants", 4}, {"Animals", 3}, {"Crafting", 7},
+                    {"Artistic", 4}, {"Medicine", 4}, {"Social", 4}, {"Intellectual", 7}
                 },
-                new Dictionary<string, Passion> { {"Construction", Passion.Major}, {"Mining", Passion.Minor}, {"Crafting", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Construction", Passion.Major} }
             ),
         };
     }
@@ -203,7 +221,9 @@ namespace BarbosinaStory
             }
 
             // Навыки: проходим ВСЕ скиллы, чтобы ничего не осталось от рандома.  
-            // Не перечисленные в пресете обнуляются, страсть None.  
+            // Уровень берём из словаря (не указан = 0, но у нас заданы все 12).  
+            // Страсть: если навык есть в passions - ставим его (Major), иначе  
+            // всем даём хотя бы мелкий огонёк (Minor).  
             foreach (SkillDef skillDef in DefDatabase<SkillDef>.AllDefsListForReading)
             {
                 SkillRecord record = pawn.skills.GetSkill(skillDef);
@@ -215,7 +235,7 @@ namespace BarbosinaStory
 
                 record.passion = data.passions.TryGetValue(skillDef.defName, out Passion passion)
                     ? passion
-                    : Passion.None;
+                    : Passion.Minor;
 
                 record.xpSinceLastLevel = 0f;
                 record.xpSinceMidnight = 0f;
@@ -300,4 +320,43 @@ namespace BarbosinaStory
             }
         }
     }
-}  
+
+    // ============================================================  
+    // Автоприменение пресетов при открытии редактора стартовых пешек.  
+    // Без этого шестёрка появляется только после ручного клика "случайно".  
+    // PreOpen у Page_ConfigureStartingPawns вызывается один раз при открытии  
+    // экрана; мы прогоняем каждый слот через тот же путь, что и кнопка  
+    // "случайно" (RandomizeStartingPawnByIndex -> NewGeneratedStartingPawn),  
+    // поэтому срабатывает постфикс выше и применяет пресеты.  
+    // ============================================================  
+    [HarmonyPatch(typeof(Page_ConfigureStartingPawns), "PreOpen")]
+    public static class Patch_ConfigureStartingPawns_PreOpen
+    {
+        public static void Postfix()
+        {
+            if (Find.Scenario == null) return;
+
+            ScenarioDef scenDef = DefDatabase<ScenarioDef>.GetNamedSilentFail(BarbosinaPresetData.ScenarioDefName);
+            if (scenDef == null || Find.Scenario != scenDef.scenario) return;
+            if (Find.GameInitData == null) return;
+
+            try
+            {
+                var pawns = Find.GameInitData.startingAndOptionalPawns;
+                int count = System.Math.Min(BarbosinaPresetData.Characters.Count, pawns.Count);
+
+                for (int i = 0; i < count; i++)
+                {
+                    // Тот же путь, что и у кнопки "случайно": гоним слот через  
+                    // пропатченный NewGeneratedStartingPawn(i) и кладём результат  
+                    // обратно в список. Постфикс навесит пресет и обновит превью.  
+                    pawns[i] = StartingPawnUtility.NewGeneratedStartingPawn(i);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось перегенерировать стартовых пешек на входе: {e.Message}");
+            }
+        }
+    }
+}
