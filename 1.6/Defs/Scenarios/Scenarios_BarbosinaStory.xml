@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!--
+    Кастомный сценарий "Барбосина: Дипломатический крах".
+    ParentName="ScenarioBase": базовый абстрактный ScenarioDef уже определён
+    в ванильном Core (Scenarios_Classic.xml), поэтому здесь его переопределять не нужно.
+  -->
+  <ScenarioDef ParentName="ScenarioBase">
+    <defName>BarbosinaStory_Crash</defName>
+    <label>Барбосина: Дипломатический крах</label>
+    <description>ГОСУДАРСТВА
+
+Фостерия, она же Солнечное королевство. Правят Фостер и его правая рука, апостол Акаси, который для короля явно не просто помощник (при дворе давно шепчутся, что они куда ближе, чем положено по протоколу). Королевство помешано на культе солнца, живёт бесконечным праздником и почему то регулярно "плодит" багов, зелёных тварей, расползающихся потом по соседям.
+
+Кумаростан. Во главе Кумар, бессменный лидер страны, где следят буквально за всем и всеми. При этом сам Кумар, несмотря на всю мощь режима, человек на удивление нервный и хрупкий, а вовсе не тот грубиян, каким его любят изображать в пропаганде соседи. Кумаростан идеологически и по духу близок Фостерии, состоит с ней в тесном союзе.
+
+Хмуростан. Во главе Хмурый, он же muederatte. Формально не полностью самостоятелен, по факту субъект Барсеговины. Тайно ведёт загадочный "проект Рельсы", о котором никому не рассказывает, и регулярно зачищает у себя багов, которых, по слухам, разводит Фостерия. Последнюю это слегка задевает, хотя до открытой вражды не доходит.
+
+Барсеговина. Тут не один лидер, а сразу несколько альтер-эго одного человека. Барсик, он же B4rs1k, старается тащить страну к лучшему. Бармик время от времени провоцирует соседей. А Барбос это уже тотальная моральная деградация, с ним связывают слухи про закрытый "остров Барбоса", где будто бы держат каких-то "бобрих". Что там на самом деле, толком никто не знает.
+
+Киткат, он же Respectable. Бывший фейл-стейт "кткткрафт", вынужденно ставший марионеткой Кумаростана. Официально выполняет приказы, но не всегда с ними согласен, отсюда и собственная подпольная фабрика троллей: то фейки разошлёт, то правду, ведёт от лица анонимного "лжекумара" пропагандистский тикток-канал, о существовании которого сам Кумаростан даже не подозревает. Барсик в курсе и иногда помогает Киткату с психологическими операциями против общего окружения.
+
+ОТНОШЕНИЯ
+
+Кумаростан и Фостерия близкие союзники, вдвоём давят на Хмуростан. Барсеговину трогать боятся: когда то между ней и Кумаростаном случилась кровопролитная война, легендарные "биороботы-барбосы" маршем шли на Кумаростан, а кумаристы, если верить рассказам, бились до последнего кумариста. Закончилось почти ничем, кроме заморозки конфликта и демилитаризованной зоны, в той войне участвовал и Хмуростан.
+
+Барсеговина держит нейтралитет со всеми, одно время даже сотрудничала с Фостерией, но потом охладела. Фостерия к Хмуростану скорее прохладна, не столько по идейным причинам, сколько потому что хмуристы вычищают у себя тех самых багов. Киткат формально марионетка Кумаростана, но по духу такой же одиночка, как Барбос, с Хмуростаном нейтрален, с Барсеговиной в доверительных отношениях. Хмуростану в целом спокойно живётся под крылом Барсеговины, не то что Киткату под Кумаростаном.
+
+ЗАВЯЗКА
+
+После затяжной и кровавой войны представители всех шести государств, Кумар, Фостер, Акаси, Барбос, Киткат и Хмурый, впервые за долгое время садятся на один корабль, чтобы долететь до нейтральной точки и подписать мир.
+
+Корабль построила Фостерия по чертежам, тайно украденным у неё же самой и слегка недоработанным, с прицелом на то, чтобы перехватить всю делегацию разом на подлёте и одним махом решить вопрос переговоров силой. План не сработал: из трюма, где прятались законсервированные баги, что то пошло не так, тварей прорвало наружу, конструкция не выдержала прямо в полёте, и корабль рухнул на ближайшую пригодную для жизни планету.
+
+Теперь шестерым, которые последние годы только и делали что враждовали, торговались и следили друг за другом, придётся как то ужиться на одной карте, отбиться от вылезших из обломков багов и вместе выбраться в космос, чтобы связаться с командованием и наконец вернуться домой.</description>
+    <scenario>
+      <summary>Шесть дипломатов враждующих государств выживают после крушения корабля мирных переговоров. Смешанный стартовый гир.</summary>
+      <parts>
+
+        <!--
+          Config pages: 6 стартовых персонажей.
+          pawnChoiceCount увеличен для запаса, но теперь это не обязательно:
+          имя, черты, навыки, биографии и отношения всех шести жёстко
+          закреплены Harmony-патчем (Source/BarbosinaPawnPresets), а сами
+          именные биографии (BarbosinaStory_Backstories.xml) помечены
+          shuffleable=false и больше не всплывают у случайных нпс или на
+          экране рандомизации, только у этих шести.
+        -->
+        <li Class="ScenPart_ConfigPage_ConfigureStartingPawns">
+          <def>ConfigPage_ConfigureStartingPawns</def>
+          <pawnCount>6</pawnCount>
+          <pawnChoiceCount>30</pawnChoiceCount>
+        </li>
+
+        <!-- Прибытие: дроп-подами, как после крушения -->
+        <li Class="ScenPart_PlayerPawnsArriveMethod">
+          <def>PlayerPawnsArriveMethod</def>
+          <method>DropPods</method>
+          <visible>false</visible>
+        </li>
+
+        <!-- Стартовые ресурсы: серебро -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Silver</thingDef>
+          <count>2750</count>
+        </li>
+
+        <!-- Еда -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>MealSurvivalPack</thingDef>
+          <count>40</count>
+        </li>
+
+        <!-- Медицина и компоненты -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>MedicineIndustrial</thingDef>
+          <count>20</count>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>ComponentIndustrial</thingDef>
+          <count>20</count>
+        </li>
+
+        <!-- Оружие -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Gun_BoltActionRifle</thingDef>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Gun_Revolver</thingDef>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>MeleeWeapon_Knife</thingDef>
+          <stuff>Steel</stuff>
+        </li>
+
+        <!-- Броня/одежда -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Apparel_FlakVest</thingDef>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Apparel_FlakPants</thingDef>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Apparel_AdvancedHelmet</thingDef>
+          <stuff>Plasteel</stuff>
+        </li>
+
+        <!-- Стройматериалы -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Steel</thingDef>
+          <count>300</count>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>WoodLog</thingDef>
+          <count>200</count>
+        </li>
+
+        <!-- От себя пара приколов: дипломаты явно прихватили что-то не по протоколу -->
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Beer</thingDef>
+          <count>20</count>
+        </li>
+        <li Class="ScenPart_StartingThing_Defined">
+          <def>StartingThing_Defined</def>
+          <thingDef>Chocolate</thingDef>
+          <count>15</count>
+        </li>
+
+        <!-- Стартовое животное -->
+        <li Class="ScenPart_StartingAnimal">
+          <def>StartingAnimal</def>
+          <count>1</count>
+          <bondToRandomPlayerPawnChance>1.0</bondToRandomPlayerPawnChance>
+        </li>
+
+        <!-- Обломки корабля рядом со стартом -->
+        <li Class="ScenPart_ScatterThingsNearPlayerStart">
+          <def>ScatterThingsNearPlayerStart</def>
+          <thingDef>Steel</thingDef>
+          <count>250</count>
+        </li>
+        <li Class="ScenPart_ScatterThingsAnywhere">
+          <def>ScatterThingsAnywhere</def>
+          <thingDef>ShipChunk</thingDef>
+          <allowRoofed>false</allowRoofed>
+          <count>4</count>
+        </li>
+
+        <!-- Диалог при старте игры -->
+        <li Class="ScenPart_GameStartDialog">
+          <def>GameStartDialog</def>
+          <text>Кумар, Фостер, Акаси, Барбос, Киткат и Хмурый, летели одним рейсом ради хрупкого перемирия между враждующими государствами. Фостер, как обычно, не отпускал от себя Акаси ни на шаг, и на этот раз тоже.
+
+Корабль был построен по ворованным чертежам с расчётом на перехват делегации. Расчёт не сработал: из трюма вырвались баги, конструкция не выдержала, и вот вы на незнакомой планете, вдалеке от дома, вынужденные как то договориться друг с другом, чтобы выжить и вернуться.</text>
+          <closeSound>GameStartSting</closeSound>
+        </li>
+
+      </parts>
+    </scenario>
+  </ScenarioDef>
+
+</Defs>

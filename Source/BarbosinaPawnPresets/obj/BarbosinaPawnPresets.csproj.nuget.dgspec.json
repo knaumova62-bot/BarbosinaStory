@@ -1,0 +1,55 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\BarbosinaStory\\Source\\BarbosinaPawnPresets\\BarbosinaPawnPresets.csproj": {}
+  },
+  "projects": {
+    "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\BarbosinaStory\\Source\\BarbosinaPawnPresets\\BarbosinaPawnPresets.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\BarbosinaStory\\Source\\BarbosinaPawnPresets\\BarbosinaPawnPresets.csproj",
+        "projectName": "BarbosinaPawnPresets",
+        "projectPath": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\BarbosinaStory\\Source\\BarbosinaPawnPresets\\BarbosinaPawnPresets.csproj",
+        "packagesPath": "C:\\Users\\knaum\\.nuget\\packages\\",
+        "outputPath": "D:\\SteamLibrary\\steamapps\\common\\RimWorld\\Mods\\BarbosinaStory\\Source\\BarbosinaPawnPresets\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\knaum\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "framework": "net472",
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.400"
+      },
+      "frameworks": {
+        "net472": {
+          "framework": "net472",
+          "targetAlias": "net472",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.400\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\1.6\Assemblies\BarbosinaPawnPresets.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\1.6\Assemblies\BarbosinaPawnPresets.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.csproj.AssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.GeneratedMSBuildEditorConfig.editorconfig
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.pdb
