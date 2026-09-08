@@ -1,260 +1,245 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<Defs>
-
-  <!--
-    Именные биографии шести стартовых персонажей "Барбосина: Дипломатический крах".
-
-    ВАЖНО (техническое ограничение движка): чистый XML не позволяет жёстко
-    привязать конкретную биографию к конкретному слоту стартового персонажа —
-    это делается только через код (C#/Harmony). Поэтому ниже — макс. приближение:
-    12 именных биографий (Детство+Взрослость на каждого из 6 лидеров), которые
-    попадают в общий пул биографий для стартовых колонистов (spawnCategories
-    Offworld/Outlander без requiresSpawnCategory, как у обычных "гражданских"
-    биографий). При выборе на экране "Настроить стартовых персонажей"
-    (pawnChoiceCount увеличен в сценарии) нужно проматывать варианты стрелками
-    и смотреть на титул биографии — если видите "Кумар, глава Кумаростана" и т.п.,
-    это и есть готовый персонаж с нужными чертами/навыками: останется только
-    вписать ему имя в поле сверху.
-  -->
-
-  <!-- ================= КУМАР — Кумаростан ================= -->
-
-  <BackstoryDef>
-    <defName>BB_KumarChild</defName>
-    <title>наследник Кумаростана</title>
-    <titleShort>наследник</titleShort>
-    <description>[PAWN_nameDef] с детства рос(ла) под сотней шоколадных глаз камер слежения — будущий глава Кумаростана, страны тотального контроля. Уже тогда [PAWN_pronoun] научил(ась) докладывать на других раньше, чем на [PAWN_objective] донесут.</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Social>3</Social>
-      <Shooting>1</Shooting>
-      <Intellectual>2</Intellectual>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_KumarAdult</defName>
-    <title>Кумар, глава Кумаростана</title>
-    <titleShort>Кумар</titleShort>
-    <description>[PAWN_nameDef] — бессменный лидер Кумаростана, государства тотальной слежки и культа личности. Близкий союзник Фостерии, годами душит Хмуростан и делает вид, что не замечает происходящего в Киткате. Пережил(а) войну с Барсеговиной и с тех пор предпочитает не испытывать судьбу.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Social>6</Social>
-      <Shooting>5</Shooting>
-      <Intellectual>3</Intellectual>
-    </skillGains>
-    <forcedTraits>
-      <Abrasive>0</Abrasive>
-      <Industriousness>2</Industriousness>
-    </forcedTraits>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <!-- ================= ФОСТЕР — Фостерия (Солнечное королевство) ================= -->
-
-  <BackstoryDef>
-    <defName>BB_FosterChild</defName>
-    <title>дитя Солнечного королевства</title>
-    <titleShort>солнечное дитя</titleShort>
-    <description>[PAWN_nameDef] рос(ла) при дворе будущего Солнечного королевства, окружённый(ая) блеском, музыкой и вниманием придворных. С юных лет [PAWN_pronoun] знал(а), что однажды всё это будет принадлежать [PAWN_objective].</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Social>3</Social>
-      <Artistic>2</Artistic>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_FosterAdult</defName>
-    <title>Фостер, король Солнечного королевства</title>
-    <titleShort>Фостер</titleShort>
-    <description>[PAWN_nameDef] — правитель Фостерии, известной культом солнца, пышными празднествами и странной привычкой государства "плодить" багов, расползающихся по соседям. Ближайший союзник Кумаростана. Рядом с [PAWN_objective] почти всегда его апостол и правая рука — Акаси.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Social>8</Social>
-      <Artistic>5</Artistic>
-    </skillGains>
-    <forcedTraits>
-      <NaturalMood>2</NaturalMood>
-      <Beauty>1</Beauty>
-    </forcedTraits>
-    <workDisables>
-      <li>Intellectual</li>
-    </workDisables>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <!-- ================= АКАСИ — апостол Фостера ================= -->
-
-  <BackstoryDef>
-    <defName>BB_AkasiChild</defName>
-    <title>послушник солнечного культа</title>
-    <titleShort>послушник</titleShort>
-    <description>[PAWN_nameDef] с ранних лет изучал(а) обряды солнечного культа Фостерии, готовясь стать самым доверенным лицом при дворе.</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Intellectual>3</Intellectual>
-      <Social>1</Social>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_AkasiAdult</defName>
-    <title>Акаси, апостол Фостера</title>
-    <titleShort>Акаси</titleShort>
-    <description>[PAWN_nameDef] — приближённый и апостол короля Фостера, второй человек в Солнечном королевстве. Держит на себе половину придворных дел, пока Фостер занят празднествами.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Social>5</Social>
-      <Intellectual>6</Intellectual>
-      <Medicine>3</Medicine>
-    </skillGains>
-    <forcedTraits>
-      <Nerves>2</Nerves>
-    </forcedTraits>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <!-- ================= БАРБОС / БАРСИК — Барсеговина ================= -->
-
-  <BackstoryDef>
-    <defName>BB_BarbosChild</defName>
-    <title>дитя Барсеговины</title>
-    <titleShort>барсеговинец</titleShort>
-    <description>[PAWN_nameDef] рос(ла) в Барсеговине, стране, старающейся держать нейтралитет со всеми соседями. Уже тогда в [PAWN_objective] уживались разные стороны характера.</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Social>2</Social>
-      <Construction>2</Construction>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_BarbosAdult</defName>
-    <title>Барбос, лидер Барсеговины</title>
-    <titleShort>Барбос</titleShort>
-    <description>[PAWN_nameDef] — лидер Барсеговины, страны с самым мягким режимом из шести. У [PAWN_objective] несколько альтер-эго: рассудительный Барсик, задиристый Бармик и мрачно известный Барбос, с которым связывают слухи о таинственном "острове". Держит нейтралитет со всеми и покровительствует Хмуростану.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Social>6</Social>
-      <Shooting>5</Shooting>
-      <Construction>4</Construction>
-    </skillGains>
-    <forcedTraits>
-      <Nerves>1</Nerves>
-      <Industriousness>1</Industriousness>
-    </forcedTraits>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <!-- ================= КИТКАТ / RESPECTABLE ================= -->
-
-  <BackstoryDef>
-    <defName>BB_KitkatChild</defName>
-    <title>дитя ктктркафта</title>
-    <titleShort>ктткрафтовец</titleShort>
-    <description>[PAWN_nameDef] рос(ла) в независимом "кткткрафте", ещё не зная, что однажды государство падёт и превратится в марионетку Кумаростана.</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Intellectual>2</Intellectual>
-      <Artistic>2</Artistic>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_KitkatAdult</defName>
-    <title>Киткат, лидер Respectable</title>
-    <titleShort>Киткат</titleShort>
-    <description>[PAWN_nameDef] возглавляет то, что осталось от павшего кткткрафта — теперь марионеточное государство Кумаростана. Официально выполняет приказы, но втайне ведёт собственную фабрику троллей и пропаганду от лица анонимного "лжекумара". С Барсеговиной — в доверительных отношениях.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Social>7</Social>
-      <Intellectual>5</Intellectual>
-      <Artistic>4</Artistic>
-    </skillGains>
-    <forcedTraits>
-      <Undergrounder>0</Undergrounder>
-      <NaturalMood>1</NaturalMood>
-    </forcedTraits>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <!-- ================= ХМУРЫЙ / MUEDERATTE — Хмуростан ================= -->
-
-  <BackstoryDef>
-    <defName>BB_HmuryChild</defName>
-    <title>дитя Хмуростана</title>
-    <titleShort>хмуростанец</titleShort>
-    <description>[PAWN_nameDef] рос(ла) в Хмуростане, субъекте Барсеговины, среди строек и регулярных зачисток багов, откуда-то время от времени приползающих со стороны Фостерии.</description>
-    <slot>Childhood</slot>
-    <skillGains>
-      <Construction>2</Construction>
-      <Mining>2</Mining>
-    </skillGains>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
-  <BackstoryDef>
-    <defName>BB_HmuryAdult</defName>
-    <title>Хмурый (muederatte), лидер Хмуростана</title>
-    <titleShort>Хмурый</titleShort>
-    <description>[PAWN_nameDef] — глава Хмуростана, формально субъекта Барсеговины. Ведёт втайне ото всех загадочный "проект Рельсы" и регулярно зачищает у себя багов. Под крылом Барсеговины [PAWN_objective] живётся спокойнее, чем Киткату под Кумаростаном — хотя Фостерию [PAWN_pronoun] недолюбливает.</description>
-    <slot>Adulthood</slot>
-    <skillGains>
-      <Construction>6</Construction>
-      <Shooting>4</Shooting>
-      <Intellectual>4</Intellectual>
-      <Mining>2</Mining>
-    </skillGains>
-    <forcedTraits>
-      <NaturalMood>-2</NaturalMood>
-      <Industriousness>2</Industriousness>
-    </forcedTraits>
-    <workDisables>
-      <li>Social</li>
-    </workDisables>
-    <spawnCategories>
-      <li>Offworld</li>
-      <li>Outlander</li>
-    </spawnCategories>
-  </BackstoryDef>
-
+<?xml version="1.0" encoding="utf-8" ?>  
+<Defs>  
+  
+  <!--  
+    Именные биографии шести стартовых персонажей "Барбосина: Дипломатический крах".  
+  
+    spawnCategory у всех выставлена в кастомную BarbosinaStoryHidden, которую  
+    не использует ни один PawnKindDef. Значит, эти биографии не попадают в общий  
+    пул и не всплывают ни у случайных НПС, ни на экране рандомизации. Стартовым  
+    шестерым они выставляются напрямую по defName через Harmony-патч  
+    (Source/BarbosinaPawnPresets). Пол всех шести принудительно мужской, поэтому  
+    тексты написаны в мужском роде.  
+  -->  
+  
+  <!-- ================= КУМАР — Кумаростан ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_KumarChild</defName>  
+    <title>наследник Кумаростана</title>  
+    <titleShort>наследник</titleShort>  
+    <description>[PAWN_nameDef] вырос под прицелом камер, будущий хозяин Кумаростана, где следят за каждым шагом. Ещё ребёнком он усвоил простую истину: доложи первым, пока не доложили на тебя.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Social>3</Social>  
+      <Intellectual>2</Intellectual>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_KumarAdult</defName>  
+    <title>Кумар, глава Кумаростана</title>  
+    <titleShort>Кумар</titleShort>  
+    <description>[PAWN_nameDef] много лет правит Кумаростаном, страной тотальной слежки и культа личности. Держится за союз с Фостерией, давит на Хмуростан и делает вид, что не замечает, чем на самом деле занят Киткат. Только вот сам он куда слабее своего же образа: пропаганда рисует грозного вождя, а на деле это дёрганый и хлипкий человек, который боится собственной тени.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Social>5</Social>  
+      <Intellectual>3</Intellectual>  
+    </skillGains>  
+    <forcedTraits>  
+      <Wimp>0</Wimp>  
+      <Nerves>-1</Nerves>  
+    </forcedTraits>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <!-- ================= ФОСТЕР — Фостерия (Солнечное королевство) ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_FosterChild</defName>  
+    <title>дитя Солнечного королевства</title>  
+    <titleShort>солнечное дитя</titleShort>  
+    <description>[PAWN_nameDef] рос при дворе будущего Солнечного королевства, среди блеска, музыки и раболепных придворных. Он с малых лет знал, что однажды весь этот праздник станет его собственным.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Social>3</Social>  
+      <Artistic>2</Artistic>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_FosterAdult</defName>  
+    <title>Фостер, король Солнечного королевства</title>  
+    <titleShort>Фостер</titleShort>  
+    <description>[PAWN_nameDef] правит Фостерией, где поклоняются солнцу, живут одним бесконечным праздником и почему то постоянно плодят багов, что потом расползаются к соседям. Ближе всех к Кумаростану по духу и по союзу. Рядом с ним почти всегда его апостол и правая рука Акаси, и при дворе давно перестали делать вид, будто между ними только служба.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Social>8</Social>  
+      <Artistic>5</Artistic>  
+    </skillGains>  
+    <forcedTraits>  
+      <Gay>0</Gay>  
+      <NaturalMood>2</NaturalMood>  
+      <Beauty>1</Beauty>  
+    </forcedTraits>  
+    <workDisables>  
+      <li>Intellectual</li>  
+    </workDisables>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <!-- ================= АКАСИ — апостол Фостера ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_AkasiChild</defName>  
+    <title>послушник солнечного культа</title>  
+    <titleShort>послушник</titleShort>  
+    <description>[PAWN_nameDef] с ранних лет зубрил обряды солнечного культа Фостерии и метил в самое доверенное лицо при дворе. Метил и попал.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Intellectual>3</Intellectual>  
+      <Social>1</Social>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_AkasiAdult</defName>  
+    <title>Акаси, апостол Фостера</title>  
+    <titleShort>Акаси</titleShort>  
+    <description>[PAWN_nameDef] служит апостолом при короле Фостере и считается вторым человеком в Солнечном королевстве, а заодно и самым близким для короля. Пока Фостер занят празднествами, именно на нём держится половина придворных дел.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Intellectual>6</Intellectual>  
+      <Social>5</Social>  
+      <Medicine>4</Medicine>  
+    </skillGains>  
+    <forcedTraits>  
+      <Gay>0</Gay>  
+      <Nerves>2</Nerves>  
+    </forcedTraits>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <!-- ================= БАРБОС / БАРСИК — Барсеговина ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_BarbosChild</defName>  
+    <title>дитя Барсеговины</title>  
+    <titleShort>барсеговинец</titleShort>  
+    <description>[PAWN_nameDef] рос в Барсеговине, стране, которая старается ладить со всеми соседями сразу. Уже тогда в нём уживалось несколько совсем разных характеров.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Social>2</Social>  
+      <Construction>2</Construction>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_BarbosAdult</defName>  
+    <title>Барбос, лидер Барсеговины</title>  
+    <titleShort>Барбос</titleShort>  
+    <description>[PAWN_nameDef] возглавляет Барсеговину, страну с самым мягким режимом из всех шести. Внутри него уживается сразу несколько личностей: рассудительный Барсик, который тянет страну вверх, задиристый Бармик, который любит подначить соседей, и тёмный Барбос, вокруг которого ходят мрачные слухи про закрытый остров. Со всеми держит нейтралитет и прикрывает Хмуростан.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Social>6</Social>  
+      <Shooting>6</Shooting>  
+      <Construction>5</Construction>  
+      <Melee>4</Melee>  
+    </skillGains>  
+    <forcedTraits>  
+      <Nerves>1</Nerves>  
+      <Industriousness>1</Industriousness>  
+    </forcedTraits>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <!-- ================= КИТКАТ / RESPECTABLE ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_KitkatChild</defName>  
+    <title>дитя кткткрафта</title>  
+    <titleShort>ктткрафтовец</titleShort>  
+    <description>[PAWN_nameDef] рос в независимом кткткрафте и понятия не имел, что его страна однажды рухнет и ляжет под Кумаростан.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Intellectual>2</Intellectual>  
+      <Artistic>2</Artistic>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_KitkatAdult</defName>  
+    <title>Киткат, лидер Respectable</title>  
+    <titleShort>Киткат</titleShort>  
+    <description>[PAWN_nameDef] заправляет тем, что осталось от павшего кткткрафта, теперь это марионетка Кумаростана. На словах он послушно выполняет приказы, а за спиной у хозяина крутит собственную фабрику троллей и ведёт пропаганду от лица выдуманного лжекумара. С Барсеговиной у него доверительные отношения, и Барсик про его игры прекрасно знает.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Social>7</Social>  
+      <Intellectual>6</Intellectual>  
+      <Artistic>5</Artistic>  
+      <Crafting>4</Crafting>  
+    </skillGains>  
+    <forcedTraits>  
+      <Undergrounder>0</Undergrounder>  
+      <NaturalMood>1</NaturalMood>  
+    </forcedTraits>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <!-- ================= ХМУРЫЙ / MUEDERATTE — Хмуростан ================= -->  
+  
+  <BackstoryDef>  
+    <defName>BB_HmuryChild</defName>  
+    <title>дитя Хмуростана</title>  
+    <titleShort>хмуростанец</titleShort>  
+    <description>[PAWN_nameDef] рос в Хмуростане под крылом Барсеговины, среди строек и вечных зачисток багов, которые то и дело приползали со стороны Фостерии.</description>  
+    <slot>Childhood</slot>  
+    <skillGains>  
+      <Construction>3</Construction>  
+      <Mining>2</Mining>  
+    </skillGains>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
+  <BackstoryDef>  
+    <defName>BB_HmuryAdult</defName>  
+    <title>Хмурый (muederatte), лидер Хмуростана</title>  
+    <titleShort>Хмурый</titleShort>  
+    <description>[PAWN_nameDef] стоит во главе Хмуростана, который формально подчиняется Барсеговине. Втайне ото всех он ведёт загадочный проект Рельсы и постоянно вычищает у себя багов. Под крылом Барсеговины ему живётся куда спокойнее, чем Киткату под Кумаростаном, а вот Фостерию он на дух не переносит.</description>  
+    <slot>Adulthood</slot>  
+    <skillGains>  
+      <Construction>7</Construction>  
+      <Mining>5</Mining>  
+      <Shooting>4</Shooting>  
+      <Intellectual>4</Intellectual>  
+    </skillGains>  
+    <forcedTraits>  
+      <NaturalMood>-2</NaturalMood>  
+      <Industriousness>2</Industriousness>  
+    </forcedTraits>  
+    <workDisables>  
+      <li>Social</li>  
+    </workDisables>  
+    <spawnCategories>  
+      <li>BarbosinaStoryHidden</li>  
+    </spawnCategories>  
+  </BackstoryDef>  
+  
 </Defs>

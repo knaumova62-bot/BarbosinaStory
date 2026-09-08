@@ -5,3 +5,4 @@ D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPa
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.csproj.CoreCompileInputs.cache
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.dll
 D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\BarbosinaStory\Source\BarbosinaPawnPresets\obj\Release\BarbosinaPawnPresets.sourcelink.json
