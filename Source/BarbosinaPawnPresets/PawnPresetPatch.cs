@@ -129,9 +129,9 @@ namespace BarbosinaStory
                 new Dictionary<string, int> {
                     {"Shooting", 7}, {"Melee", 5}, {"Construction", 6}, {"Mining", 4},
                     {"Cooking", 4}, {"Plants", 4}, {"Animals", 4}, {"Crafting", 5},
-                    {"Artistic", 4}, {"Medicine", 4}, {"Social", 7}, {"Intellectual", 5}
+                    {"Artistic", 4}, {"Medicine", 4}, {"Social", 7}, {"Intellectual", 7}
                 },
-                new Dictionary<string, Passion> { {"Shooting", Passion.Major} }
+                new Dictionary<string, Passion> { { "Intellectual", Passion.Major }, { "Shooting", Passion.Major} }
             ),  
   
             // 4: Киткат — Respectable. Боец + мозг, рукастый.  
@@ -144,7 +144,7 @@ namespace BarbosinaStory
                     {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 5},
                     {"Artistic", 6}, {"Medicine", 4}, {"Social", 8}, {"Intellectual", 7}
                 },
-                new Dictionary<string, Passion> { {"Intellectual", Passion.Major}, {"Social", Passion.Major} }
+                new Dictionary<string, Passion> { {"Intellectual", Passion.Major}, { "Melee", Passion.Major} }
             ),  
   
             // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель и ремесло, умный.  
