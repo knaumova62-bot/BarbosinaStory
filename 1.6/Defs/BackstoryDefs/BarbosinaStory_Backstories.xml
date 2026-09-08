@@ -234,9 +234,6 @@
       <NaturalMood>-2</NaturalMood>  
       <Industriousness>2</Industriousness>  
     </forcedTraits>  
-    <workDisables>  
-      <li>Social</li>  
-    </workDisables>  
     <spawnCategories>  
       <li>BarbosinaStoryHidden</li>  
     </spawnCategories>  
