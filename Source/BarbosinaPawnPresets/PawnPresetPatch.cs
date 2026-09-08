@@ -15,9 +15,11 @@ namespace BarbosinaStory
     // Harmony напишет в Player.log ошибку "Method not found".  
     //  
     // Что делает патч (только для сценария BarbosinaStory_Crash):  
-    //  - для слотов 0..5 ставит имя, пол, черты, навыки, страсти, биографии;  
-    //  - всем шестерым принудительно ставит мужской пол и чинит тело/голову,  
-    //    чтобы модель не оставалась женской или пустой;  
+    //  - для слотов 0..5 ставит имя, пол, возраст, черты, навыки, страсти, биографии;  
+    //  - все 12 навыков задаются явно (неуказанные = 0, страсть None),  
+    //    поэтому рероль не меняет статы;  
+    //  - возраст случайный 19..30 лет;  
+    //  - всем шестерым принудительно ставит мужской пол и чинит тело/голову;  
     //  - чистит все случайные родственные и социальные связи;  
     //  - Фостера (слот 1) и Акаси (слот 2) делает геями и любовниками;  
     //  - после правок сбрасывает графику и портрет, чтобы превью не было пустым.  
@@ -67,73 +69,77 @@ namespace BarbosinaStory
         public const int FosterIndex = 1;
         public const int AkasiIndex = 2;
 
+        // Возраст всех шести: случайный в этом диапазоне (включительно)  
+        public const int MinAge = 19;
+        public const int MaxAge = 30;
+
         // Индекс в списке = индекс стартового слота (0..5).  
         public static readonly List<BarbosinaCharacterPreset> Characters = new List<BarbosinaCharacterPreset>
         {  
-            // 0: Кумар — Кумаростан. Нервный и хрупкий слабак.  
+            // 0: Кумар — Кумаростан. Слабак, но фермер: тянет растения.  
             new BarbosinaCharacterPreset(
                 "Кумар", "Кумар", "Кумаростан",
                 "BB_KumarChild", "BB_KumarAdult",
                 new List<(string, int)> { ("Wimp", 0), ("Nerves", -1) },
                 new Dictionary<string, int> {
-                    {"Social", 7}, {"Intellectual", 5}, {"Shooting", 3}, {"Melee", 2}
+                    {"Plants", 7}, {"Animals", 4}, {"Social", 4}, {"Cooking", 3}
                 },
-                new Dictionary<string, Passion> { {"Social", Passion.Major} }
+                new Dictionary<string, Passion> { {"Plants", Passion.Minor} }
             ),  
   
-            // 1: Фостер — Солнечное королевство. Обаятельный, но толку мало.  
+            // 1: Фостер — Солнечное королевство. Слабак, но дрессировщик и художник.  
             new BarbosinaCharacterPreset(
                 "Фостер", "Фостер", "Фостерия",
                 "BB_FosterChild", "BB_FosterAdult",
                 new List<(string, int)> { ("Gay", 0), ("NaturalMood", 2), ("Beauty", 1) },
                 new Dictionary<string, int> {
-                    {"Social", 8}, {"Artistic", 5}, {"Construction", 2}
+                    {"Animals", 6}, {"Artistic", 6}, {"Social", 6}
                 },
-                new Dictionary<string, Passion> { {"Social", Passion.Major}, {"Artistic", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Animals", Passion.Minor}, {"Artistic", Passion.Minor} }
             ),  
   
-            // 2: Акаси — апостол и любовник Фостера. Слабый, но что-то умеет.  
+            // 2: Акаси — апостол и любовник Фостера. Слабак, но доктор.  
             new BarbosinaCharacterPreset(
                 "Акаси", "Акаси", "Фостерия",
                 "BB_AkasiChild", "BB_AkasiAdult",
                 new List<(string, int)> { ("Gay", 0), ("Nerves", 2) },
                 new Dictionary<string, int> {
-                    {"Intellectual", 6}, {"Medicine", 4}, {"Social", 5}
+                    {"Medicine", 7}, {"Social", 4}, {"Intellectual", 3}, {"Plants", 3}
                 },
-                new Dictionary<string, Passion> { {"Intellectual", Passion.Minor}, {"Medicine", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Medicine", Passion.Minor} }
             ),  
   
-            // 3: Барбос/Барсик — Барсеговина. Сильный универсал.  
+            // 3: Барбос/Барсик — Барсеговина. Боевой универсал, средние статки.  
             new BarbosinaCharacterPreset(
                 "Барбос", "Барсик", "Барсеговина",
                 "BB_BarbosChild", "BB_BarbosAdult",
                 new List<(string, int)> { ("Nerves", 1), ("Industriousness", 1) },
                 new Dictionary<string, int> {
-                    {"Social", 7}, {"Shooting", 7}, {"Construction", 6}, {"Melee", 5}, {"Mining", 4}
+                    {"Shooting", 7}, {"Melee", 5}, {"Social", 7}, {"Construction", 6}, {"Mining", 4}, {"Intellectual", 5}
                 },
                 new Dictionary<string, Passion> { {"Shooting", Passion.Major}, {"Construction", Passion.Minor} }
             ),  
   
-            // 4: Киткат — Respectable. Сильный: умный, социальный, рукастый.  
+            // 4: Киткат — Respectable. Боец + мозг, рукастый.  
             new BarbosinaCharacterPreset(
                 "Киткат", "Respectable", "",
                 "BB_KitkatChild", "BB_KitkatAdult",
                 new List<(string, int)> { ("Undergrounder", 0), ("NaturalMood", 1) },
                 new Dictionary<string, int> {
-                    {"Social", 8}, {"Intellectual", 7}, {"Artistic", 6}, {"Crafting", 5}
+                    {"Intellectual", 7}, {"Social", 8}, {"Artistic", 6}, {"Crafting", 5}, {"Shooting", 4}
                 },
                 new Dictionary<string, Passion> { {"Intellectual", Passion.Major}, {"Social", Passion.Minor} }
             ),  
   
-            // 5: Хмурый / muederatte — Хмуростан. Сильный строитель и шахтёр.  
+            // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель и ремесло, умный, соц вернули.  
             new BarbosinaCharacterPreset(
                 "Хмурый", "muederatte", "Хмуростан",
                 "BB_HmuryChild", "BB_HmuryAdult",
                 new List<(string, int)> { ("NaturalMood", -2), ("Industriousness", 2) },
                 new Dictionary<string, int> {
-                    {"Construction", 9}, {"Mining", 7}, {"Shooting", 6}, {"Intellectual", 6}
+                    {"Construction", 9}, {"Crafting", 7}, {"Mining", 7}, {"Intellectual", 7}, {"Shooting", 5}, {"Social", 4}
                 },
-                new Dictionary<string, Passion> { {"Construction", Passion.Major}, {"Mining", Passion.Minor} }
+                new Dictionary<string, Passion> { {"Construction", Passion.Major}, {"Mining", Passion.Minor}, {"Crafting", Passion.Minor} }
             ),
         };
     }
@@ -141,8 +147,6 @@ namespace BarbosinaStory
     [HarmonyPatch(typeof(StartingPawnUtility), nameof(StartingPawnUtility.NewGeneratedStartingPawn))]
     public static class Patch_NewGeneratedStartingPawn
     {
-        // Ссылки на сгенерированные стартовые пешки по индексу слота,  
-        // чтобы связать Фостера и Акаси даже если слоты катаются по отдельности.  
         private static readonly Dictionary<int, Pawn> GeneratedPawns = new Dictionary<int, Pawn>();
 
         public static void Postfix(int index, ref Pawn __result)
@@ -167,11 +171,13 @@ namespace BarbosinaStory
             // Имя  
             pawn.Name = new NameTriple(data.firstName, data.nickName, data.lastName);
 
+            // Возраст: случайный 19..30 (единственное, что меняется при перекате)  
+            RandomizeAge(pawn);
+
             // Пол: всем мужской, с починкой тела и головы  
             ForceMale(pawn);
 
-            // Чистим все случайные связи (родня, бывшие и т.п.).  
-            // Единственная намеренная связь — Фостер и Акаси, ставится ниже отдельно.  
+            // Чистим все случайные связи. Фостер и Акаси связываются ниже отдельно.  
             if (pawn.relations != null)
             {
                 pawn.relations.ClearAllRelations();
@@ -196,26 +202,43 @@ namespace BarbosinaStory
                 pawn.story.traits.GainTrait(new Trait(traitDef, degree, true));
             }
 
-            // Навыки  
-            foreach (var kv in data.skillLevels)
+            // Навыки: проходим ВСЕ скиллы, чтобы ничего не осталось от рандома.  
+            // Не перечисленные в пресете обнуляются, страсть None.  
+            foreach (SkillDef skillDef in DefDatabase<SkillDef>.AllDefsListForReading)
             {
-                SkillDef skillDef = DefDatabase<SkillDef>.GetNamedSilentFail(kv.Key);
-                if (skillDef == null)
-                {
-                    Log.Warning($"[BarbosinaStory] SkillDef '{kv.Key}' не найден, пропускаю.");
-                    continue;
-                }
                 SkillRecord record = pawn.skills.GetSkill(skillDef);
-                record.Level = kv.Value;
-                if (data.passions.TryGetValue(kv.Key, out Passion passion))
-                {
-                    record.passion = passion;
-                }
+                if (record == null) continue;
+
+                int level = 0;
+                data.skillLevels.TryGetValue(skillDef.defName, out level);
+                record.Level = level;
+
+                record.passion = data.passions.TryGetValue(skillDef.defName, out Passion passion)
+                    ? passion
+                    : Passion.None;
+
+                record.xpSinceLastLevel = 0f;
+                record.xpSinceMidnight = 0f;
             }
         }
 
-        // Принудительно делает пешку мужчиной и чинит тело/голову,  
-        // чтобы модель не осталась женской и не пропала.  
+        // Случайный возраст 19..30 лет (биологический и хронологический).  
+        private static void RandomizeAge(Pawn pawn)
+        {
+            try
+            {
+                long years = Rand.RangeInclusive(BarbosinaPresetData.MinAge, BarbosinaPresetData.MaxAge);
+                long ticks = years * 3600000L; // GenDate.TicksPerYear  
+                pawn.ageTracker.AgeBiologicalTicks = ticks;
+                pawn.ageTracker.AgeChronologicalTicks = ticks;
+            }
+            catch (System.Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось выставить возраст: {e.Message}");
+            }
+        }
+
+        // Принудительно делает пешку мужчиной и чинит тело/голову.  
         private static void ForceMale(Pawn pawn)
         {
             try
@@ -224,13 +247,11 @@ namespace BarbosinaStory
 
                 if (pawn.story != null)
                 {
-                    // Тело: если стоит женское, меняем на стандартное мужское  
                     if (pawn.story.bodyType == BodyTypeDefOf.Female)
                     {
                         pawn.story.bodyType = BodyTypeDefOf.Male;
                     }
 
-                    // Голова: если женская или пустая, подбираем мужскую  
                     bool needHead = pawn.story.headType == null || pawn.story.headType.gender == Gender.Female;
                     if (needHead)
                     {
@@ -251,7 +272,6 @@ namespace BarbosinaStory
             }
         }
 
-        // Связывает Фостера и Акаси как любовников, если оба слота уже созданы.  
         private static void TryLinkFosterAkasi()
         {
             if (!GeneratedPawns.TryGetValue(BarbosinaPresetData.FosterIndex, out Pawn foster)) return;
@@ -264,7 +284,6 @@ namespace BarbosinaStory
             foster.relations.AddDirectRelation(PawnRelationDefOf.Lover, akasi);
         }
 
-        // Сброс графики и портрета, чтобы превью пешки не было пустым.  
         private static void RefreshVisuals(Pawn pawn)
         {
             try
@@ -281,4 +300,4 @@ namespace BarbosinaStory
             }
         }
     }
-}
+}  
