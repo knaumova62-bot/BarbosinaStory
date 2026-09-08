@@ -89,8 +89,8 @@ namespace BarbosinaStory
                 new List<(string, int)> { ("Wimp", 0), ("Nerves", -1) },
                 new Dictionary<string, int> {
                     {"Shooting", 2}, {"Melee", 1}, {"Construction", 2}, {"Mining", 2},
-                    {"Cooking", 4}, {"Plants", 7}, {"Animals", 4}, {"Crafting", 3},
-                    {"Artistic", 2}, {"Medicine", 3}, {"Social", 4}, {"Intellectual", 4}
+                    {"Cooking", 2}, {"Plants", 7}, {"Animals", 4}, {"Crafting", 3},
+                    {"Artistic", 2}, {"Medicine", 3}, {"Social", 2}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> { {"Plants", Passion.Major} }
             ),  
@@ -103,7 +103,7 @@ namespace BarbosinaStory
                 new Dictionary<string, int> {
                     {"Shooting", 3}, {"Melee", 3}, {"Construction", 2}, {"Mining", 2},
                     {"Cooking", 3}, {"Plants", 3}, {"Animals", 6}, {"Crafting", 3},
-                    {"Artistic", 6}, {"Medicine", 2}, {"Social", 6}, {"Intellectual", 1}
+                    {"Artistic", 2}, {"Medicine", 2}, {"Social", 2}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> { {"Animals", Passion.Major}, {"Artistic", Passion.Major} }
             ),  
@@ -116,7 +116,7 @@ namespace BarbosinaStory
                 new Dictionary<string, int> {
                     {"Shooting", 2}, {"Melee", 2}, {"Construction", 2}, {"Mining", 2},
                     {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 3},
-                    {"Artistic", 3}, {"Medicine", 7}, {"Social", 4}, {"Intellectual", 4}
+                    {"Artistic", 2}, {"Medicine", 7}, {"Social", 3}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> { {"Medicine", Passion.Major} }
             ),  
@@ -129,7 +129,7 @@ namespace BarbosinaStory
                 new Dictionary<string, int> {
                     {"Shooting", 7}, {"Melee", 5}, {"Construction", 6}, {"Mining", 4},
                     {"Cooking", 4}, {"Plants", 4}, {"Animals", 4}, {"Crafting", 5},
-                    {"Artistic", 3}, {"Medicine", 4}, {"Social", 7}, {"Intellectual", 5}
+                    {"Artistic", 4}, {"Medicine", 4}, {"Social", 7}, {"Intellectual", 5}
                 },
                 new Dictionary<string, Passion> { {"Shooting", Passion.Major} }
             ),  
