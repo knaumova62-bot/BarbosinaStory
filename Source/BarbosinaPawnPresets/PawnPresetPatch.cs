@@ -140,7 +140,7 @@ namespace BarbosinaStory
   
             // 4: Киткат — Respectable. Рукастый пропагандист, держит троллефабрику.  
             new BarbosinaCharacterPreset(
-                "Киткат", "Respectable", "",
+                "Киткат", "Respectable", "Кумаростан",
                 "BB_KitkatChild", "BB_KitkatAdult",
                 new List<(string, int)> { ("Undergrounder", 0), ("NaturalMood", 1) },
                 new Dictionary<string, int> {

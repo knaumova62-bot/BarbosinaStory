@@ -6,53 +6,64 @@ using Verse.AI.Group;
 namespace BarbosinaStory
 {
     // ============================================================  
-    // Скриптовое событие "баги из трюма": через пару игровых часов  
-    // после старта на карту с края прибегает небольшая стайка слабых  
-    // жуков (Megascarab) и идёт на колонию. Разово, один раз за игру.  
+    // Скриптовое событие "баги из пульта управления": в первые часы  
+    // после старта на карту накатывает несколько волн слабых жуков  
+    // (Megascarab), с интервалом между волнами, а затем всё стихает.  
+    // Всего пара-тройка волн за игру, только в первые сутки с небольшим.  
     // Работает только в сценарии BarbosinaStory_Crash.  
     // ============================================================  
     public class GameComponent_BarbosinaBugs : GameComponent
     {
-        // ~2 игровых часа. В RimWorld 2500 тиков = 1 час (GenDate.TicksPerHour).  
-        private const int DelayTicks = 5000;
+        // ~2 игровых часа до первой волны. 2500 тиков = 1 час.  
+        private const int FirstDelayTicks = 5000;
 
-        // Сколько жуков в набеге.  
-        private const int MinBugs = 3;
-        private const int MaxBugs = 5;
+        // Интервал между волнами (~8 игровых часов).  
+        private const int BetweenWavesTicks = 20000;
 
-        private int ticksUntilSwarm = -1;
-        private bool swarmDone = false;
+        // Всего волн за игру.  
+        private const int TotalWaves = 3;
+
+        // Сколько жуков в одной волне.  
+        private const int MinBugs = 2;
+        private const int MaxBugs = 4;
+
+        private int ticksUntilWave = -1;
+        private int wavesDone = 0;
 
         public GameComponent_BarbosinaBugs(Game game) { }
 
         public override void ExposeData()
         {
-            Scribe_Values.Look(ref ticksUntilSwarm, "barbosinaTicksUntilSwarm", -1);
-            Scribe_Values.Look(ref swarmDone, "barbosinaSwarmDone", false);
+            Scribe_Values.Look(ref ticksUntilWave, "barbosinaTicksUntilWave", -1);
+            Scribe_Values.Look(ref wavesDone, "barbosinaWavesDone", 0);
         }
 
         public override void FinalizeInit()
         {
-            // Запускаем таймер только один раз, в нашем сценарии.  
-            if (!swarmDone && ticksUntilSwarm < 0 && IsBarbosinaScenario())
+            // Заводим таймер первой волны только один раз, в нашем сценарии.  
+            if (wavesDone < TotalWaves && ticksUntilWave < 0 && IsBarbosinaScenario())
             {
-                ticksUntilSwarm = DelayTicks;
+                ticksUntilWave = FirstDelayTicks;
             }
         }
 
         public override void GameComponentTick()
         {
-            if (swarmDone || ticksUntilSwarm < 0) return;
+            if (wavesDone >= TotalWaves || ticksUntilWave < 0) return;
 
-            ticksUntilSwarm--;
-            if (ticksUntilSwarm > 0) return;
+            ticksUntilWave--;
+            if (ticksUntilWave > 0) return;
 
             SpawnBugSwarm();
-            swarmDone = true;
+            wavesDone++;
+
+            // Если волны ещё остались - заводим таймер на следующую,  
+            // иначе выключаем событие насовсем.  
+            ticksUntilWave = wavesDone < TotalWaves ? BetweenWavesTicks : -1;
         }
 
-        // internal (не private), чтобы GameComponent_BarbosinaEvents мог переиспользовать
-        // ту же проверку сценария и не дублировать логику.
+        // internal (не private), чтобы GameComponent_BarbosinaEvents мог переиспользовать  
+        // ту же проверку сценария и не дублировать логику.  
         internal static bool IsBarbosinaScenario()
         {
             ScenarioDef scenDef = DefDatabase<ScenarioDef>.GetNamedSilentFail(BarbosinaPresetData.ScenarioDefName);
@@ -99,8 +110,8 @@ namespace BarbosinaStory
                     spawned);
 
                 Find.LetterStack.ReceiveLetter(
-                    "Баги из трюма",
-                    "Из обломков корабля выбралась стайка багов и рванула прямо к вам. Тварей немного и они хлипкие, но зубы у них есть. Встречайте гостей.",
+                    "Баги из пульта управления",
+                    "Из обломков пульта управления снова полезли баги и рванули прямо к вам. Тварей немного и они хлипкие, но зубы у них есть. Встречайте гостей.",
                     LetterDefOf.ThreatBig,
                     new LookTargets(spawned));
             }

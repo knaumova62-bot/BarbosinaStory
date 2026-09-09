@@ -254,9 +254,9 @@ namespace BarbosinaStory
 
         // Интервал между попытками ~5-15 дней, шанс сработать при попытке -  
         // вместе это в среднем даёт "пару раз в месяц".  
-        private const int MinDays = 5;
-        private const int MaxDays = 15;
-        private const float Chance = 0.6f;
+        private const int MinDays = 30;
+        private const int MaxDays = 60;
+        private const float Chance = 0.35f;
 
         private const int MinAwayDays = 1;
         private const int MaxAwayDays = 2;
@@ -328,9 +328,9 @@ namespace BarbosinaStory
         private const string FosterNick = "Фостер";
         private const string AkasiNick = "Акаси";
 
-        private const int MinDays = 5;
-        private const int MaxDays = 15;
-        private const float Chance = 0.6f;
+        private const int MinDays = 15;
+        private const int MaxDays = 30;
+        private const float Chance = 0.4f;
 
         // Порядок предпочтений ментального срыва: пробуем безобидный  
         // "психотичное блуждание", если defName в этой версии игры  
@@ -436,9 +436,9 @@ namespace BarbosinaStory
         private const string Nick = "muederatte";
 
         // Реже, чем у Барбоса, и с меньшим шансом сработать при попытке.  
-        private const int MinDays = 20;
-        private const int MaxDays = 45;
-        private const float Chance = 0.5f;
+        private const int MinDays = 45;
+        private const int MaxDays = 90;
+        private const float Chance = 0.3f;
 
         private const int MinAwayDays = 7;
         private const int MaxAwayDays = 30;
