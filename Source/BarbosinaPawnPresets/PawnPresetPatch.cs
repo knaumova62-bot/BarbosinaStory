@@ -170,6 +170,27 @@ namespace BarbosinaStory
                 }
             ),
         };
+
+        // Маленький хелпер для скриптовых событий (GameComponent_BarbosinaEvents):
+        // ищет заспавненного колониста игрока по нику среди всех карт.
+        // Не трогает остальную логику пресетов.
+        public static Pawn FindColonistByNick(string nick)
+        {
+            if (string.IsNullOrEmpty(nick)) return null;
+
+            foreach (Map map in Find.Maps)
+            {
+                foreach (Pawn pawn in map.mapPawns.FreeColonistsSpawned)
+                {
+                    if (pawn.Name is NameTriple nt && nt.Nick == nick)
+                    {
+                        return pawn;
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 
     [HarmonyPatch(typeof(StartingPawnUtility), nameof(StartingPawnUtility.NewGeneratedStartingPawn))]

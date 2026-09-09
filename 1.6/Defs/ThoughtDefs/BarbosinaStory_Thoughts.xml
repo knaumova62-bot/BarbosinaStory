@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!--
+    Кастомная мысль для скриптового события "Фостер сходит с ума"
+    (Source/BarbosinaPawnPresets/GameComponent_BarbosinaEvents.cs,
+    FosterMeltdownEvent). Выдаётся Акаси, когда он с шансом X
+    расстраивается из-за срыва Фостера, но сам не срывается.
+
+    thoughtClass="Thought_Memory" - обычная затухающая память,
+    ставится через TryGainMemory и сама угасает за durationDays.
+  -->
+
+  <ThoughtDef>
+    <defName>BB_AkasiSadAboutFoster</defName>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <durationDays>2</durationDays>
+    <stages>
+      <li>
+        <label>Фостер опять сорвался</label>
+        <description>Фостер снова устроил дичь на людях. Акаси места себе не находит от переживаний за него.</description>
+        <baseMoodEffect>-6</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+</Defs>
