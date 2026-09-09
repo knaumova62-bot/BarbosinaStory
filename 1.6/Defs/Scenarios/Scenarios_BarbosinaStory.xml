@@ -153,14 +153,6 @@
           <def>StartingResearch</def>  
           <project>Electricity</project>  
         </li>  
-        <li Class="ScenPart_StartingResearch">  
-          <def>StartingResearch</def>  
-          <project>Batteries</project>  
-        </li>  
-        <li Class="ScenPart_StartingResearch">  
-          <def>StartingResearch</def>  
-          <project>GunTurrets</project>  
-        </li>  
   
         <!-- Стартовое животное -->  
         <li Class="ScenPart_StartingAnimal">  

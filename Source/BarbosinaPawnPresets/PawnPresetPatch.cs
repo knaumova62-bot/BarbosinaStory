@@ -77,18 +77,18 @@ namespace BarbosinaStory
         // и мажоры, и выбранные миноры; всем остальным навыкам огонька нет.  
         public static readonly List<BarbosinaCharacterPreset> Characters = new List<BarbosinaCharacterPreset>
         {  
-            // 0: Кумар — Кумаростан. Слабак и трус, но фермер: тянет растения и готовку.  
+            // 0: Кумар — Кумаростан. Слабак и трус, реально полезен только на грядках и кухне.  
             new BarbosinaCharacterPreset(
                 "Кумар", "Кумар", "Кумаростан",
                 "BB_KumarChild", "BB_KumarAdult",
                 new List<(string, int)> { ("Wimp", 0), ("Nerves", -1) },
                 new Dictionary<string, int> {
-                    {"Shooting", 2}, {"Melee", 1}, {"Construction", 2}, {"Mining", 1},
-                    {"Cooking", 4}, {"Plants", 6}, {"Animals", 3}, {"Crafting", 2},
-                    {"Artistic", 2}, {"Medicine", 2}, {"Social", 4}, {"Intellectual", 2}
+                    {"Shooting", 0}, {"Melee", 0}, {"Construction", 1}, {"Mining", 0},
+                    {"Cooking", 4}, {"Plants", 6}, {"Animals", 2}, {"Crafting", 1},
+                    {"Artistic", 1}, {"Medicine", 1}, {"Social", 3}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> {
-                    {"Plants", Passion.Major}, {"Cooking", Passion.Minor}, {"Social", Passion.Minor}
+                    {"Plants", Passion.Major}, {"Cooking", Passion.Minor}
                 }
             ),  
   
@@ -98,12 +98,12 @@ namespace BarbosinaStory
                 "BB_FosterChild", "BB_FosterAdult",
                 new List<(string, int)> { ("Gay", 0), ("NaturalMood", 2), ("Beauty", 1) },
                 new Dictionary<string, int> {
-                    {"Shooting", 2}, {"Melee", 2}, {"Construction", 2}, {"Mining", 1},
-                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 6}, {"Crafting", 2},
-                    {"Artistic", 5}, {"Medicine", 2}, {"Social", 5}, {"Intellectual", 1}
+                    {"Shooting", 1}, {"Melee", 1}, {"Construction", 0}, {"Mining", 0},
+                    {"Cooking", 1}, {"Plants", 1}, {"Animals", 7}, {"Crafting", 1},
+                    {"Artistic", 5}, {"Medicine", 0}, {"Social", 4}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> {
-                    {"Animals", Passion.Major}, {"Artistic", Passion.Minor}, {"Social", Passion.Minor}
+                    {"Animals", Passion.Major}, {"Artistic", Passion.Minor}
                 }
             ),  
   
@@ -113,12 +113,12 @@ namespace BarbosinaStory
                 "BB_AkasiChild", "BB_AkasiAdult",
                 new List<(string, int)> { ("Gay", 0), ("Nerves", 2) },
                 new Dictionary<string, int> {
-                    {"Shooting", 2}, {"Melee", 2}, {"Construction", 2}, {"Mining", 1},
-                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 2},
-                    {"Artistic", 2}, {"Medicine", 6}, {"Social", 3}, {"Intellectual", 2}
+                    {"Shooting", 0}, {"Melee", 0}, {"Construction", 1}, {"Mining", 0},
+                    {"Cooking", 1}, {"Plants", 1}, {"Animals", 1}, {"Crafting", 1},
+                    {"Artistic", 1}, {"Medicine", 7}, {"Social", 4}, {"Intellectual", 1}
                 },
                 new Dictionary<string, Passion> {
-                    {"Medicine", Passion.Major}, {"Cooking", Passion.Minor}
+                    {"Medicine", Passion.Major}, {"Social", Passion.Minor}
                 }
             ),  
   
@@ -128,16 +128,17 @@ namespace BarbosinaStory
                 "BB_BarbosChild", "BB_BarbosAdult",
                 new List<(string, int)> { ("Nerves", 1), ("Industriousness", 1) },
                 new Dictionary<string, int> {
-                    {"Shooting", 6}, {"Melee", 5}, {"Construction", 5}, {"Mining", 4},
+                    {"Shooting", 5}, {"Melee", 5}, {"Construction", 4}, {"Mining", 3},
                     {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 4},
-                    {"Artistic", 3}, {"Medicine", 3}, {"Social", 5}, {"Intellectual", 4}
+                    {"Artistic", 3}, {"Medicine", 3}, {"Social", 5}, {"Intellectual", 5}
                 },
                 new Dictionary<string, Passion> {
-                    {"Shooting", Passion.Major}, {"Melee", Passion.Minor}, {"Social", Passion.Minor}
+                    {"Shooting", Passion.Major},
+                    {"Social", Passion.Minor}, {"Intellectual", Passion.Minor}
                 }
             ),  
   
-            // 4: Киткат — Respectable. Боец + мозг, рукастый.  
+            // 4: Киткат — Respectable. Рукастый пропагандист, держит троллефабрику.  
             new BarbosinaCharacterPreset(
                 "Киткат", "Respectable", "",
                 "BB_KitkatChild", "BB_KitkatAdult",
@@ -145,25 +146,27 @@ namespace BarbosinaStory
                 new Dictionary<string, int> {
                     {"Shooting", 4}, {"Melee", 4}, {"Construction", 4}, {"Mining", 3},
                     {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 5},
-                    {"Artistic", 5}, {"Medicine", 3}, {"Social", 7}, {"Intellectual", 6}
+                    {"Artistic", 5}, {"Medicine", 3}, {"Social", 5}, {"Intellectual", 5}
                 },
                 new Dictionary<string, Passion> {
-                    {"Social", Passion.Major}, {"Intellectual", Passion.Minor}, {"Melee", Passion.Minor}
+                    {"Crafting", Passion.Major},
+                    {"Social", Passion.Minor}, {"Intellectual", Passion.Minor}
                 }
             ),  
   
-            // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель и ремесло, умный.  
+            // 5: Хмурый / muederatte — Хмуростан. Средний бой, топ строитель.  
             new BarbosinaCharacterPreset(
                 "Хмурый", "muederatte", "Хмуростан",
                 "BB_HmuryChild", "BB_HmuryAdult",
                 new List<(string, int)> { ("NaturalMood", -2), ("Industriousness", 2) },
                 new Dictionary<string, int> {
-                    {"Shooting", 4}, {"Melee", 4}, {"Construction", 8}, {"Mining", 6},
-                    {"Cooking", 3}, {"Plants", 4}, {"Animals", 3}, {"Crafting", 6},
-                    {"Artistic", 3}, {"Medicine", 3}, {"Social", 4}, {"Intellectual", 5}
+                    {"Shooting", 4}, {"Melee", 4}, {"Construction", 5}, {"Mining", 5},
+                    {"Cooking", 3}, {"Plants", 3}, {"Animals", 3}, {"Crafting", 5},
+                    {"Artistic", 3}, {"Medicine", 3}, {"Social", 5}, {"Intellectual", 5}
                 },
                 new Dictionary<string, Passion> {
-                    {"Construction", Passion.Major}, {"Crafting", Passion.Minor}, {"Mining", Passion.Minor}
+                    {"Construction", Passion.Major},
+                    {"Social", Passion.Minor}, {"Intellectual", Passion.Minor}
                 }
             ),
         };
@@ -305,9 +308,22 @@ namespace BarbosinaStory
             if (foster == null || akasi == null || foster == akasi) return;
             if (foster.relations == null || akasi.relations == null) return;
 
-            if (foster.relations.DirectRelationExists(PawnRelationDefOf.Lover, akasi)) return;
+            // Сносим ЛЮБЫЕ старые Lover-связи у ОБОИХ партнёров перед пересборкой.
+            // Это чинит баг: при рероле только Фостера или только Акаси у второго,
+            // нерерольного партнёра могла остаться Lover-связь на уже выброшенный
+            // объект пешки (ApplyPreset чистит relations только у текущей пешки),
+            // из-за чего DirectRelationExists не находил совпадение и добавлял
+            // вторую, "осиротевшую" запись вместо замены старой.
+            RemoveAllOfDef(foster, PawnRelationDefOf.Lover);
+            RemoveAllOfDef(akasi, PawnRelationDefOf.Lover);
 
             foster.relations.AddDirectRelation(PawnRelationDefOf.Lover, akasi);
+        }
+
+        private static void RemoveAllOfDef(Pawn pawn, PawnRelationDef def)
+        {
+            var stale = pawn.relations.DirectRelations.Where(r => r.def == def).ToList();
+            foreach (var r in stale) pawn.relations.RemoveDirectRelation(r);
         }
 
         private static void RefreshVisuals(Pawn pawn)
