@@ -2,27 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
+using RimWorld.Planet;
 using Verse;
 
 namespace BarbosinaStory
 {
-    // ============================================================
-    // Скриптовые события сценария BarbosinaStory_Crash:
-    //   1) Барбос периодически пропадает на 1-2 дня и возвращается.
-    //   2) Фостер периодически впадает в мем-психоз; Акаси реагирует.
-    //   3) Хмурый редко пропадает надолго (неделя-месяц).
-    //
-    // Стиль и хелперы переиспользуют GameComponent_BarbosinaBugs:
-    // тот же guard на сценарий (IsBarbosinaScenario), тот же паттерн
-    // try/catch + Log.Warning("[BarbosinaStory] ..."), тот же способ
-    // искать PawnKindDef/MentalStateDef через DefDatabase.GetNamedSilentFail,
-    // чтобы не падать на несовпадении сигнатур между версиями игры.
-    //
-    // Структура рассчитана на расширение: каждое событие — это
-    // BarbosinaScriptedEvent с методом TryFire() и своим интервалом
-    // (в днях). Чтобы добавить новое событие, достаточно написать ещё
-    // один класс-наследник и добавить его в список Events ниже.
-    // ============================================================
+    // ============================================================  
+    // Скриптовые события сценария BarbosinaStory_Crash:  
+    //   1) Барбос периодически пропадает на 1-2 дня и возвращается.  
+    //   2) Фостер периодически впадает в мем-психоз; Акаси реагирует.  
+    //   3) Хмурый редко пропадает надолго (неделя-месяц).  
+    //  
+    // Стиль и хелперы переиспользуют GameComponent_BarbosinaBugs:  
+    // тот же guard на сценарий (IsBarbosinaScenario), тот же паттерн  
+    // try/catch + Log.Warning("[BarbosinaStory] ..."), тот же способ  
+    // искать PawnKindDef/MentalStateDef через DefDatabase.GetNamedSilentFail,  
+    // чтобы не падать на несовпадении сигнатур между версиями игры.  
+    //  
+    // Структура рассчитана на расширение: каждое событие — это  
+    // BarbosinaScriptedEvent с методом TryFire() и своим интервалом  
+    // (в днях). Чтобы добавить новое событие, достаточно написать ещё  
+    // один класс-наследник и добавить его в список Events ниже.  
+    // ============================================================  
     public class GameComponent_BarbosinaEvents : GameComponent
     {
         private readonly List<BarbosinaScriptedEvent> events = new List<BarbosinaScriptedEvent>
@@ -36,9 +37,9 @@ namespace BarbosinaStory
 
         public override void ExposeData()
         {
-            // Порядок events фиксирован в коде (не зависит от сейва), поэтому
-            // достаточно каждому событию сохранять свои поля под своими же
-            // именами ключей — коллизий не будет.
+            // Порядок events фиксирован в коде (не зависит от сейва), поэтому  
+            // достаточно каждому событию сохранять свои поля под своими же  
+            // именами ключей — коллизий не будет.  
             foreach (BarbosinaScriptedEvent scriptedEvent in events)
             {
                 scriptedEvent.ExposeData();
@@ -47,8 +48,8 @@ namespace BarbosinaStory
 
         public override void GameComponentTick()
         {
-            // Работаем только в нашем сценарии - переиспользуем guard
-            // из GameComponent_BarbosinaBugs, чтобы не дублировать логику.
+            // Работаем только в нашем сценарии - переиспользуем guard  
+            // из GameComponent_BarbosinaBugs, чтобы не дублировать логику.  
             if (!GameComponent_BarbosinaBugs.IsBarbosinaScenario()) return;
 
             Map map = Find.CurrentMap;
@@ -61,12 +62,12 @@ namespace BarbosinaStory
         }
     }
 
-    // ============================================================
-    // Базовый класс скриптового события: сам считает случайный интервал
-    // между попытками (в игровых днях) и сам катает шанс срабатывания,
-    // плюс отдельный ExtraTick для событий с "отложенным" действием
-    // (например, возврат пропавшей пешки).
-    // ============================================================
+    // ============================================================  
+    // Базовый класс скриптового события: сам считает случайный интервал  
+    // между попытками (в игровых днях) и сам катает шанс срабатывания,  
+    // плюс отдельный ExtraTick для событий с "отложенным" действием  
+    // (например, возврат пропавшей пешки).  
+    // ============================================================  
     public abstract class BarbosinaScriptedEvent
     {
         protected abstract string Id { get; }
@@ -97,8 +98,8 @@ namespace BarbosinaStory
                 }
             }
 
-            // Отдельный хук для действий, которые тикают независимо от
-            // таймера ролла (например: "пора вернуть пропавшую пешку").
+            // Отдельный хук для действий, которые тикают независимо от  
+            // таймера ролла (например: "пора вернуть пропавшую пешку").  
             ExtraTick(map);
         }
 
@@ -113,7 +114,7 @@ namespace BarbosinaStory
             }
             catch (Exception e)
             {
-                Log.Warning($"[BarbosinaStory] Событие '{Id}' упало при срабатывании: {e.Message}");
+                Log.Warning($"[BarbosinaStory] Событие '{Id}' упало при срабatывании: {e.Message}");
             }
         }
 
@@ -123,23 +124,23 @@ namespace BarbosinaStory
             ticksUntilRoll = days * GenDate.TicksPerDay;
         }
 
-        // Основная логика события. Событие само решает, что делать,
-        // если целевой пешки нет на карте/она мертва - тогда просто
-        // ничего не происходит (попытка "сгорает").
+        // Основная логика события. Событие само решает, что делать,  
+        // если целевой пешки нет на карте/она мертва - тогда просто  
+        // ничего не происходит (попытка "сгорает").  
         protected abstract void TryFire(Map map);
 
-        // Переопределяется событиями с отложенным действием
-        // (Барбос/Хмурый: нужно каждый тик проверять, не пора ли вернуться).
+        // Переопределяется событиями с отложенным действием  
+        // (Барбос/Хмурый: нужно каждый тик проверять, не пора ли вернуться).  
         protected virtual void ExtraTick(Map map) { }
     }
 
-    // ============================================================
-    // Общие хелперы для событий "пешка пропадает и возвращается".
-    // ============================================================
+    // ============================================================  
+    // Общие хелперы для событий "пешка пропадает и возвращается".  
+    // ============================================================  
     internal static class BarbosinaEventUtility
     {
-        // Убирает пешку с карты и передаёт её в WorldPawns "навсегда",
-        // чтобы игра не сочла её мусором и не удалила во время отлучки.
+        // Убирает пешку с карты и передаёт её в WorldPawns "навсегда",  
+        // чтобы игра не сочла её мусором и не удалила во время отлучки.  
         internal static void SendAway(Pawn pawn)
         {
             Map map = pawn.Map;
@@ -159,8 +160,8 @@ namespace BarbosinaStory
             }
         }
 
-        // Возвращает ранее отправленную в WorldPawns пешку обратно на карту,
-        // у случайной клетки входа, и полностью её лечит.
+        // Возвращает ранее отправленную в WorldPawns пешку обратно на карту,  
+        // у случайной клетки входа, и полностью её лечит.  
         internal static bool TryBringBack(Pawn pawn, Map map)
         {
             try
@@ -174,7 +175,7 @@ namespace BarbosinaStory
 
                 if (pawn.Dead)
                 {
-                    // Мёртвых не воскрешаем - событие просто не срабатывает.
+                    // Мёртвых не воскрешаем - событие просто не срабатывает.  
                     return false;
                 }
 
@@ -195,10 +196,10 @@ namespace BarbosinaStory
             }
         }
 
-        // "Ни пылинки на нём": чиним недостающие части тела и снимаем
-        // все плохие hediff'ы (ранения, болезни, инфекции и т.п.).
-        // Не трогаем hediff'ы, которые def считает не "плохими"
-        // (импланты, генетические особенности и подобное) - их лечить не нужно.
+        // "Ни пылинки на нём": чиним недостающие части тела и снимаем  
+        // все плохие hediff'ы (ранения, болезни, инфекции и т.п.).  
+        // Не трогаем hediff'ы, которые def считает не "плохими"  
+        // (импланты, генетические особенности и подобное) - их лечить не нужно.  
         internal static void HealCompletely(Pawn pawn)
         {
             try
@@ -244,15 +245,15 @@ namespace BarbosinaStory
         }
     }
 
-    // ============================================================
-    // Событие 1: "Барбос пропадает" - пара раз в месяц, на 1-2 дня.
-    // ============================================================
+    // ============================================================  
+    // Событие 1: "Барбос пропадает" - пара раз в месяц, на 1-2 дня.  
+    // ============================================================  
     public class BarbosDisappearEvent : BarbosinaScriptedEvent
     {
         private const string Nick = "Барсик";
 
-        // Интервал между попытками ~5-15 дней, шанс сработать при попытке -
-        // вместе это в среднем даёт "пару раз в месяц".
+        // Интервал между попытками ~5-15 дней, шанс сработать при попытке -  
+        // вместе это в среднем даёт "пару раз в месяц".  
         private const int MinDays = 5;
         private const int MaxDays = 15;
         private const float Chance = 0.6f;
@@ -271,15 +272,15 @@ namespace BarbosinaStory
         public override void ExposeData()
         {
             base.ExposeData();
-            // Scribe_References обязателен: без него после сейва/лоада
-            // во время отлучки ссылка на пешку потеряется.
+            // Scribe_References обязателен: без него после сейва/лоада  
+            // во время отлучки ссылка на пешку потеряется.  
             Scribe_References.Look(ref awayPawn, "barbosAwayPawn");
             Scribe_Values.Look(ref returnAtTick, "barbosReturnAtTick", -1);
         }
 
         protected override void TryFire(Map map)
         {
-            if (awayPawn != null) return; // уже в отлучке
+            if (awayPawn != null) return; // уже в отлучке  
 
             Pawn barbos = BarbosinaPresetData.FindColonistByNick(Nick);
             if (barbos == null || barbos.Dead || !barbos.Spawned) return;
@@ -318,10 +319,10 @@ namespace BarbosinaStory
         }
     }
 
-    // ============================================================
-    // Событие 2: "Фостер сходит с ума" - пара раз в месяц.
-    // Реакция Акаси: с шансом X грустит, с меньшим шансом Y тоже срывается.
-    // ============================================================
+    // ============================================================  
+    // Событие 2: "Фостер сходит с ума" - пара раз в месяц.  
+    // Реакция Акаси: с шансом X грустит, с меньшим шансом Y тоже срывается.  
+    // ============================================================  
     public class FosterMeltdownEvent : BarbosinaScriptedEvent
     {
         private const string FosterNick = "Фостер";
@@ -331,12 +332,12 @@ namespace BarbosinaStory
         private const int MaxDays = 15;
         private const float Chance = 0.6f;
 
-        // Порядок предпочтений ментального срыва: пробуем безобидный
-        // "психотичное блуждание", если defName в этой версии игры
-        // не найден - падаем на Berserk.
+        // Порядок предпочтений ментального срыва: пробуем безобидный  
+        // "психотичное блуждание", если defName в этой версии игры  
+        // не найден - падаем на Berserk.  
         private static readonly string[] PreferredMentalStates = { "Wander_Psychotic", "Berserk" };
 
-        // Акаси грустит с шансом побольше, срывается сам - с шансом поменьше.
+        // Акаси грустит с шансом побольше, срывается сам - с шансом поменьше.  
         private const float AkasiSadChance = 0.5f;
         private const float AkasiMeltdownChance = 0.15f;
 
@@ -351,7 +352,7 @@ namespace BarbosinaStory
         {
             Pawn foster = BarbosinaPresetData.FindColonistByNick(FosterNick);
             if (foster == null || foster.Dead || !foster.Spawned) return;
-            if (foster.mentalStateHandler != null && foster.mentalStateHandler.InMentalState) return;
+            if (foster.mindState.mentalStateHandler != null && foster.mindState.mentalStateHandler.InMentalState) return;
 
             MentalStateDef stateDef = FindFirstAvailable(PreferredMentalStates);
             if (stateDef == null)
@@ -360,7 +361,7 @@ namespace BarbosinaStory
                 return;
             }
 
-            bool started = foster.mentalStateHandler.TryStartMentalState(
+            bool started = foster.mindState.mentalStateHandler.TryStartMentalState(
                 stateDef,
                 reason: "Фостер сходит с ума",
                 forceWake: true);
@@ -385,11 +386,11 @@ namespace BarbosinaStory
 
                 if (Rand.Chance(AkasiMeltdownChance))
                 {
-                    if (akasi.mentalStateHandler != null && !akasi.mentalStateHandler.InMentalState)
+                    if (akasi.mindState.mentalStateHandler != null && !akasi.mindState.mentalStateHandler.InMentalState)
                     {
                         MentalStateDef stateDef = FindFirstAvailable(PreferredMentalStates);
                         if (stateDef != null &&
-                            akasi.mentalStateHandler.TryStartMentalState(stateDef, "Акаси не выдержал", forceWake: true))
+                            akasi.mindState.mentalStateHandler.TryStartMentalState(stateDef, "Акаси не выдержал", forceWake: true))
                         {
                             Find.LetterStack.ReceiveLetter(
                                 "Акаси тоже не выдержал",
@@ -427,14 +428,14 @@ namespace BarbosinaStory
         }
     }
 
-    // ============================================================
-    // Событие 3: "Хмурый пропадает надолго" - реже Барбоса, на 7-30 дней.
-    // ============================================================
+    // ============================================================  
+    // Событие 3: "Хмурый пропадает надолго" - реже Барбоса, на 7-30 дней.  
+    // ============================================================  
     public class HmuryLongDisappearEvent : BarbosinaScriptedEvent
     {
         private const string Nick = "muederatte";
 
-        // Реже, чем у Барбоса, и с меньшим шансом сработать при попытке.
+        // Реже, чем у Барбоса, и с меньшим шансом сработать при попытке.  
         private const int MinDays = 20;
         private const int MaxDays = 45;
         private const float Chance = 0.5f;
