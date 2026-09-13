@@ -11,18 +11,20 @@ namespace BarbosinaStory
     // Скриптовые события сценария BarbosinaStory_Crash:  
     //   1) Барбос периодически пропадает на 1-2 дня и возвращается.  
     //   2) Фостер периодически впадает в мем-психоз; Акаси реагирует.  
+    //      Заодно на день ловит временный Bloodlust/Psychopath.  
     //   3) Хмурый редко пропадает надолго (неделя-месяц).  
+    //   4) Барбос временно становится Cannibal ("остров дал о себе знать").  
+    //   5) Кумар временно становится Gay ("солнечные соседи повлияли").  
     //  
     // Стиль и хелперы переиспользуют GameComponent_BarbosinaBugs:  
     // тот же guard на сценарий (IsBarbosinaScenario), тот же паттерн  
     // try/catch + Log.Warning("[BarbosinaStory] ..."), тот же способ  
-    // искать PawnKindDef/MentalStateDef через DefDatabase.GetNamedSilentFail,  
-    // чтобы не падать на несовпадении сигнатур между версиями игры.  
+    // искать Def через DefDatabase.GetNamedSilentFail.  
     //  
     // Структура рассчитана на расширение: каждое событие — это  
     // BarbosinaScriptedEvent с методом TryFire() и своим интервалом  
     // (в днях). Чтобы добавить новое событие, достаточно написать ещё  
-    // один класс-наследник и добавить его в список Events ниже.  
+    // один класс-наследник и добавить его в список events ниже.  
     // ============================================================  
     public class GameComponent_BarbosinaEvents : GameComponent
     {
@@ -31,6 +33,8 @@ namespace BarbosinaStory
             new BarbosDisappearEvent(),
             new FosterMeltdownEvent(),
             new HmuryLongDisappearEvent(),
+            new BarbosCannibalEvent(),
+            new KumarGayEvent(),
         };
 
         public GameComponent_BarbosinaEvents(Game game) { }
@@ -66,7 +70,7 @@ namespace BarbosinaStory
     // Базовый класс скриптового события: сам считает случайный интервал  
     // между попытками (в игровых днях) и сам катает шанс срабатывания,  
     // плюс отдельный ExtraTick для событий с "отложенным" действием  
-    // (например, возврат пропавшей пешки).  
+    // (например, возврат пропавшей пешки или снятие временного трейта).  
     // ============================================================  
     public abstract class BarbosinaScriptedEvent
     {
@@ -99,7 +103,8 @@ namespace BarbosinaStory
             }
 
             // Отдельный хук для действий, которые тикают независимо от  
-            // таймера ролла (например: "пора вернуть пропавшую пешку").  
+            // таймера ролла (например: "пора вернуть пропавшую пешку"  
+            // или "пора снять временный трейт").  
             ExtraTick(map);
         }
 
@@ -114,7 +119,7 @@ namespace BarbosinaStory
             }
             catch (Exception e)
             {
-                Log.Warning($"[BarbosinaStory] Событие '{Id}' упало при срабatывании: {e.Message}");
+                Log.Warning($"[BarbosinaStory] Событие '{Id}' упало при срабатывании: {e.Message}");
             }
         }
 
@@ -129,8 +134,7 @@ namespace BarbosinaStory
         // ничего не происходит (попытка "сгорает").  
         protected abstract void TryFire(Map map);
 
-        // Переопределяется событиями с отложенным действием  
-        // (Барбос/Хмурый: нужно каждый тик проверять, не пора ли вернуться).  
+        // Переопределяется событиями с отложенным действием.  
         protected virtual void ExtraTick(Map map) { }
     }
 
@@ -198,8 +202,6 @@ namespace BarbosinaStory
 
         // "Ни пылинки на нём": чиним недостающие части тела и снимаем  
         // все плохие hediff'ы (ранения, болезни, инфекции и т.п.).  
-        // Не трогаем hediff'ы, которые def считает не "плохими"  
-        // (импланты, генетические особенности и подобное) - их лечить не нужно.  
         internal static void HealCompletely(Pawn pawn)
         {
             try
@@ -243,6 +245,27 @@ namespace BarbosinaStory
                 Log.Warning($"[BarbosinaStory] Не удалось долечить пешку {pawn?.Name}: {e.Message}");
             }
         }
+
+        // Ищет первый существующий TraitDef из списка предпочтений.  
+        internal static TraitDef FindFirstAvailableTrait(string[] defNames)
+        {
+            foreach (string defName in defNames)
+            {
+                TraitDef def = DefDatabase<TraitDef>.GetNamedSilentFail(defName);
+                if (def != null) return def;
+            }
+            return null;
+        }
+
+        internal static MentalStateDef FindFirstAvailableMentalState(string[] defNames)
+        {
+            foreach (string defName in defNames)
+            {
+                MentalStateDef def = DefDatabase<MentalStateDef>.GetNamedSilentFail(defName);
+                if (def != null) return def;
+            }
+            return null;
+        }
     }
 
     // ============================================================  
@@ -252,8 +275,6 @@ namespace BarbosinaStory
     {
         private const string Nick = "Барсик";
 
-        // Интервал между попытками ~5-15 дней, шанс сработать при попытке -  
-        // вместе это в среднем даёт "пару раз в месяц".  
         private const int MinDays = 30;
         private const int MaxDays = 60;
         private const float Chance = 0.35f;
@@ -272,8 +293,6 @@ namespace BarbosinaStory
         public override void ExposeData()
         {
             base.ExposeData();
-            // Scribe_References обязателен: без него после сейва/лоада  
-            // во время отлучки ссылка на пешку потеряется.  
             Scribe_References.Look(ref awayPawn, "barbosAwayPawn");
             Scribe_Values.Look(ref returnAtTick, "barbosReturnAtTick", -1);
         }
@@ -321,6 +340,7 @@ namespace BarbosinaStory
 
     // ============================================================  
     // Событие 2: "Фостер сходит с ума" - пара раз в месяц.  
+    // Заодно на день вешает временный Bloodlust/Psychopath.  
     // Реакция Акаси: с шансом X грустит, с меньшим шансом Y тоже срывается.  
     // ============================================================  
     public class FosterMeltdownEvent : BarbosinaScriptedEvent
@@ -332,10 +352,13 @@ namespace BarbosinaStory
         private const int MaxDays = 30;
         private const float Chance = 0.4f;
 
-        // Порядок предпочтений ментального срыва: пробуем безобидный  
-        // "психотичное блуждание", если defName в этой версии игры  
-        // не найден - падаем на Berserk.  
+        // Порядок предпочтений ментального срыва.  
         private static readonly string[] PreferredMentalStates = { "Wander_Psychotic", "Berserk" };
+
+        // Временный трейт на день: сначала пробуем Bloodlust, если нет - Psychopath.  
+        private static readonly string[] PreferredTraits = { "Bloodlust", "Psychopath" };
+        private const int TraitDegree = 0;
+        private const int TraitDays = 1;
 
         // Акаси грустит с шансом побольше, срывается сам - с шансом поменьше.  
         private const float AkasiSadChance = 0.5f;
@@ -343,10 +366,23 @@ namespace BarbosinaStory
 
         private const string AkasiSadThoughtDefName = "BB_AkasiSadAboutFoster";
 
+        // Отложенное снятие временного трейта у Фостера.  
+        private Pawn traitPawn;
+        private string appliedTraitDefName;
+        private int removeTraitAtTick = -1;
+
         protected override string Id => "foster_meltdown";
         protected override int MinIntervalDays => MinDays;
         protected override int MaxIntervalDays => MaxDays;
         protected override float FireChance => Chance;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_References.Look(ref traitPawn, "fosterTraitPawn");
+            Scribe_Values.Look(ref appliedTraitDefName, "fosterAppliedTrait", null);
+            Scribe_Values.Look(ref removeTraitAtTick, "fosterRemoveTraitAtTick", -1);
+        }
 
         protected override void TryFire(Map map)
         {
@@ -354,7 +390,7 @@ namespace BarbosinaStory
             if (foster == null || foster.Dead || !foster.Spawned) return;
             if (foster.mindState.mentalStateHandler != null && foster.mindState.mentalStateHandler.InMentalState) return;
 
-            MentalStateDef stateDef = FindFirstAvailable(PreferredMentalStates);
+            MentalStateDef stateDef = BarbosinaEventUtility.FindFirstAvailableMentalState(PreferredMentalStates);
             if (stateDef == null)
             {
                 Log.Warning("[BarbosinaStory] Не найден ни один MentalStateDef для срыва Фостера.");
@@ -374,7 +410,61 @@ namespace BarbosinaStory
                 LetterDefOf.NegativeEvent,
                 new LookTargets(foster));
 
+            TryApplyTempTrait(foster);
             ReactAkasi(map);
+        }
+
+        // Вешает временный трейт Фостеру, если у него его ещё нет постоянно.  
+        private void TryApplyTempTrait(Pawn foster)
+        {
+            try
+            {
+                if (traitPawn != null) return; // уже висит с прошлого раза  
+                if (foster.story?.traits == null) return;
+
+                TraitDef traitDef = BarbosinaEventUtility.FindFirstAvailableTrait(PreferredTraits);
+                if (traitDef == null) return;
+                if (foster.story.traits.HasTrait(traitDef)) return; // не трогаем постоянный  
+
+                foster.story.traits.GainTrait(new Trait(traitDef, TraitDegree, forced: true));
+
+                traitPawn = foster;
+                appliedTraitDefName = traitDef.defName;
+                removeTraitAtTick = Find.TickManager.TicksGame + TraitDays * GenDate.TicksPerDay;
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось повесить временный трейт Фостеру: {e.Message}");
+            }
+        }
+
+        protected override void ExtraTick(Map map)
+        {
+            if (traitPawn == null || removeTraitAtTick < 0) return;
+            if (Find.TickManager.TicksGame < removeTraitAtTick) return;
+
+            try
+            {
+                Pawn pawn = traitPawn;
+                string defName = appliedTraitDefName;
+
+                traitPawn = null;
+                appliedTraitDefName = null;
+                removeTraitAtTick = -1;
+
+                if (pawn == null || pawn.Dead || pawn.story?.traits == null || defName == null) return;
+
+                Trait trait = pawn.story.traits.allTraits
+                    .FirstOrDefault(t => t.def != null && t.def.defName == defName);
+                if (trait != null)
+                {
+                    pawn.story.traits.RemoveTrait(trait);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось снять временный трейт Фостера: {e.Message}");
+            }
         }
 
         private void ReactAkasi(Map map)
@@ -388,7 +478,7 @@ namespace BarbosinaStory
                 {
                     if (akasi.mindState.mentalStateHandler != null && !akasi.mindState.mentalStateHandler.InMentalState)
                     {
-                        MentalStateDef stateDef = FindFirstAvailable(PreferredMentalStates);
+                        MentalStateDef stateDef = BarbosinaEventUtility.FindFirstAvailableMentalState(PreferredMentalStates);
                         if (stateDef != null &&
                             akasi.mindState.mentalStateHandler.TryStartMentalState(stateDef, "Акаси не выдержал", forceWake: true))
                         {
@@ -416,16 +506,6 @@ namespace BarbosinaStory
                 Log.Warning($"[BarbosinaStory] Реакция Акаси на срыв Фостера упала: {e.Message}");
             }
         }
-
-        private static MentalStateDef FindFirstAvailable(string[] defNames)
-        {
-            foreach (string defName in defNames)
-            {
-                MentalStateDef def = DefDatabase<MentalStateDef>.GetNamedSilentFail(defName);
-                if (def != null) return def;
-            }
-            return null;
-        }
     }
 
     // ============================================================  
@@ -435,7 +515,6 @@ namespace BarbosinaStory
     {
         private const string Nick = "muederatte";
 
-        // Реже, чем у Барбоса, и с меньшим шансом сработать при попытке.  
         private const int MinDays = 45;
         private const int MaxDays = 90;
         private const float Chance = 0.3f;
@@ -497,5 +576,147 @@ namespace BarbosinaStory
                     new LookTargets(pawn));
             }
         }
+    }
+
+    // ============================================================  
+    // Базовый класс временного трейта: вешает трейт на пешку на N дней,  
+    // затем снимает. Не трогает трейт, если он у пешки постоянный.  
+    // ============================================================  
+    public abstract class TemporaryTraitEvent : BarbosinaScriptedEvent
+    {
+        protected abstract string TargetNick { get; }
+        protected abstract string[] PreferredTraits { get; }
+        protected abstract int TraitDegree { get; }
+        protected abstract int MinTraitDays { get; }
+        protected abstract int MaxTraitDays { get; }
+        protected abstract string GainTitle { get; }
+        protected abstract string GainText { get; }
+        protected abstract string LoseTitle { get; }
+        protected abstract string LoseText { get; }
+
+        private Pawn affectedPawn;
+        private string appliedTraitDefName;
+        private int removeAtTick = -1;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_References.Look(ref affectedPawn, $"barbosina_{Id}_affectedPawn");
+            Scribe_Values.Look(ref appliedTraitDefName, $"barbosina_{Id}_appliedTrait", null);
+            Scribe_Values.Look(ref removeAtTick, $"barbosina_{Id}_removeAtTick", -1);
+        }
+
+        protected override void TryFire(Map map)
+        {
+            if (affectedPawn != null) return; // трейт уже висит  
+
+            Pawn pawn = BarbosinaPresetData.FindColonistByNick(TargetNick);
+            if (pawn == null || pawn.Dead || pawn.story?.traits == null) return;
+
+            TraitDef traitDef = BarbosinaEventUtility.FindFirstAvailableTrait(PreferredTraits);
+            if (traitDef == null)
+            {
+                Log.Warning($"[BarbosinaStory] Не найден ни один TraitDef для события '{Id}'.");
+                return;
+            }
+
+            // Если трейт у пешки уже есть постоянно - не трогаем, иначе снимем чужой.  
+            if (pawn.story.traits.HasTrait(traitDef)) return;
+
+            pawn.story.traits.GainTrait(new Trait(traitDef, TraitDegree, forced: true));
+
+            affectedPawn = pawn;
+            appliedTraitDefName = traitDef.defName;
+            int days = Rand.RangeInclusive(MinTraitDays, MaxTraitDays);
+            removeAtTick = Find.TickManager.TicksGame + days * GenDate.TicksPerDay;
+
+            Find.LetterStack.ReceiveLetter(GainTitle, GainText, LetterDefOf.NeutralEvent, new LookTargets(pawn));
+        }
+
+        protected override void ExtraTick(Map map)
+        {
+            if (affectedPawn == null || removeAtTick < 0) return;
+            if (Find.TickManager.TicksGame < removeAtTick) return;
+
+            try
+            {
+                Pawn pawn = affectedPawn;
+                string defName = appliedTraitDefName;
+
+                affectedPawn = null;
+                appliedTraitDefName = null;
+                removeAtTick = -1;
+
+                if (pawn == null || pawn.Dead || pawn.story?.traits == null || defName == null) return;
+
+                Trait trait = pawn.story.traits.allTraits
+                    .FirstOrDefault(t => t.def != null && t.def.defName == defName);
+                if (trait != null)
+                {
+                    pawn.story.traits.RemoveTrait(trait);
+                }
+
+                if (pawn.Spawned)
+                {
+                    Find.LetterStack.ReceiveLetter(LoseTitle, LoseText, LetterDefOf.NeutralEvent, new LookTargets(pawn));
+                }
+                else
+                {
+                    Find.LetterStack.ReceiveLetter(LoseTitle, LoseText, LetterDefOf.NeutralEvent);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось снять временный трейт события '{Id}': {e.Message}");
+            }
+        }
+    }
+
+    // ============================================================  
+    // Событие 4: Барбос временно становится каннибалом.  
+    // ============================================================  
+    public class BarbosCannibalEvent : TemporaryTraitEvent
+    {
+        protected override string Id => "barbos_cannibal";
+        protected override int MinIntervalDays => 20;
+        protected override int MaxIntervalDays => 45;
+        protected override float FireChance => 0.3f;
+
+        protected override string TargetNick => "Барсик";
+        protected override string[] PreferredTraits => new[] { "Cannibal" };
+        protected override int TraitDegree => 0;
+        protected override int MinTraitDays => 2;
+        protected override int MaxTraitDays => 3;
+
+        protected override string GainTitle => "Остров Барбоса дал о себе знать";
+        protected override string GainText =>
+            "На Барбоса что-то нашло. В глазах голодный блеск, на соседей он теперь поглядывает как на обед. Островные привычки, видимо, никуда не делись.";
+        protected override string LoseTitle => "Барбос отпустило";
+        protected override string LoseText =>
+            "Барбос отошёл, аппетит к сокамерникам пропал. Снова смотрит на людей как на людей, а не как на закуску.";
+    }
+
+    // ============================================================  
+    // Событие 5: Кумар временно становится геем.  
+    // ============================================================  
+    public class KumarGayEvent : TemporaryTraitEvent
+    {
+        protected override string Id => "kumar_gay";
+        protected override int MinIntervalDays => 20;
+        protected override int MaxIntervalDays => 45;
+        protected override float FireChance => 0.3f;
+
+        protected override string TargetNick => "Кумар";
+        protected override string[] PreferredTraits => new[] { "Gay" };
+        protected override int TraitDegree => 0;
+        protected override int MinTraitDays => 2;
+        protected override int MaxTraitDays => 4;
+
+        protected override string GainTitle => "Солнечные соседи повлияли";
+        protected override string GainText =>
+            "Кумар слишком долго тёрся возле солнечных. Что-то в нём переключилось, и теперь он смотрит на боевых товарищей совсем другими глазами.";
+        protected override string LoseTitle => "Кумар пришёл в себя";
+        protected override string LoseText =>
+            "Наваждение спало, солнечное влияние выветрилось. Кумар снова прежний и делает вид, что ничего не было.";
     }
 }
