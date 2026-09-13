@@ -2,7 +2,7 @@
 <Defs>  
   <SoundDef>  
     <defName>BB_IntroSting</defName>  
-    <context>Global</context>  
+    <context>Any</context>  
     <maxSimultaneous>1</maxSimultaneous>  
     <subSounds>  
       <li>  

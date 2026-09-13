@@ -427,7 +427,7 @@ namespace BarbosinaStory
     // странице выбора места высадки). Строгий гвард обязателен: без  
     // него патч затронул бы ЛЮБОЕ подтверждающее окно в игре, включая  
     // обычный геймплей и другие сценарии.  
-    [HarmonyPatch(typeof(Dialog_MessageBox), "PostOpen")]
+    [HarmonyPatch(typeof(Window), "PostOpen")]
     public static class Patch_DialogMessageBox_AutoConfirm
     {
         public static void Postfix(object __instance)
