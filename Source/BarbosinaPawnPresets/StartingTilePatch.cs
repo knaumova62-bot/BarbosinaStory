@@ -16,7 +16,7 @@ namespace BarbosinaStory
     // высадиться в океане, на леднике/морском льду или в экстремальной
     // пустыне, а также в зоне с неадекватной средней температурой.
     //
-    // Как это сделано (четыре патча):
+    // Как это сделано (пять патчей):
     //
     // 1) Patch_TileFinder_RandomStartingTile — Postfix на ванильный
     //    TileFinder.RandomStartingTile(). Этот метод и так уже умеет
@@ -64,17 +64,33 @@ namespace BarbosinaStory
     //    что-то не находится или падает, тайл всё равно уже выбран
     //    патчем №2, и игроку останется нажать "Далее" самому.
     //
+    // 5) Patch_DialogMessageBox_AutoConfirm — Postfix на
+    //    Dialog_MessageBox.PostOpen(). Помимо диалога про близость к
+    //    другим фракциям (который убирает патч №3), игра может показать
+    //    и другие Dialog_MessageBox-подтверждения на этапе высадки -
+    //    например про соседство с загрязнёнными тайлами и риск
+    //    кислотного смога. Раз мы всё равно не даём игроку тыкать по
+    //    карте руками, любое такое окно в нашем сценарии на визарде
+    //    создания игры (ProgramState.Entry) закрывается автоматически с
+    //    положительным ответом: у экземпляра диалога рефлексией
+    //    достаётся поле acceptAction (Action) и вызывается, после чего
+    //    окно закрывается (Close(false)). Строгий гвард
+    //    (ProgramState.Entry + GameInitData != null + наш сценарий)
+    //    нужен, чтобы не тронуть подтверждающие диалоги в обычной игре
+    //    или в других сценариях.
+    //
     // ВАЖНО (см. README_BUILD.txt в этой же папке): этот файл написан
     // и вычитан по документации/декомпилированным исходникам 1.6, но
     // НЕ прогнан через реальную компиляцию с настоящими сборками игры
-    // (тут просто нет доступа к ним). Патчи №3 и №4 резолвятся по
+    // (тут просто нет доступа к ним). Патчи №3, №4 и №5 резолвятся по
     // строковому имени метода через Harmony/рефлексию, так что сами по
     // себе они не дадут ошибку компиляции, даже если сигнатура
     // CanDoNext/PostOpen в твоей сборке 1.6 будет другой - но тогда они
     // тихо не сработают (см. лог: "не нашёл ... через рефлексию") и
-    // автопролистывание откатится на ручное. Если dotnet build выдаст
-    // ошибку CS#### именно по этому файлу - пришли её мне текстом,
-    // поправлю прицельно. Подозрительные места на этот случай:
+    // автопролистывание/автоподтверждение откатится на ручное. Если
+    // dotnet build выдаст ошибку CS#### именно по этому файлу - пришли
+    // её мне текстом, поправлю прицельно. Подозрительные места на этот
+    // случай:
     //   - Find.GameInitData.startingTile - имя поля стабильно из
     //     старых версий, но его ТИП в 1.6 сменился с int на PlanetTile;
     //     если у тебя вдруг всё ещё int - просто убери .Tile-обёртки
@@ -87,6 +103,27 @@ namespace BarbosinaStory
     //     старте будет "Patching exception... Method 'CanDoNext' not
     //     found" (или PostOpen) - скинь точный текст ошибки и/или
     //     сигнатуру метода из декомпилятора (dnSpy/ILSpy), поправлю.
+    //   - Dialog_MessageBox.acceptAction - имя поля взято из
+    //     формулировки задачи, не перепроверено вживую по декомпилу
+    //     1.6 (у меня в этой сессии нет доступа ни к сборкам игры, ни
+    //     к декомпилятору). Патч дополнительно пробует поле
+    //     buttonAAction как запасной вариант, если acceptAction не
+    //     найдено или пусто - но если ни то, ни другое не срабатывает
+    //     (диалог закрывается, но без явного подтверждения выбора
+    //     тайла), напиши мне точные имена полей Dialog_MessageBox из
+    //     dnSpy/ILSpy, поправлю на месте.
+    //   - Tile.pollution - float-поле 0..1 (0% - 100% загрязнения),
+    //     используется по описанию механики Biotech; если в 1.6 оно
+    //     переименовано - подскажет ошибка компиляции "не найден член".
+    //   - Проверка мутаторов тайла (TileMutatorDef) на признак смога/
+    //     загрязнения - самая неточная часть: система мутаторов
+    //     появилась в 1.6/Odyssey, и я не проверял вживую точное имя
+    //     свойства-коллекции на Tile. Поэтому она читается рефлексией
+    //     (AccessTools.Property(typeof(Tile), "Mutators")) и при любой
+    //     ошибке/отсутствии просто ничего не отсеивает по этому
+    //     признаку, полагаясь на проверку pollution выше. Если хочешь
+    //     более точный фильтр - скинь список имён TileMutatorDef,
+    //     относящихся к загрязнению/смогу, из декомпила.
     // ============================================================
 
     public static class BarbosinaTileFilter
@@ -132,6 +169,24 @@ namespace BarbosinaStory
                 // Непроходимые тайлы (горы и т.п.) - тоже мимо.
                 if (tile.hilliness == Hilliness.Impassable) return false;
 
+                // Загрязнение (Biotech): не высаживаемся на уже
+                // загрязнённые тайлы - они же ближе к риску кислотного
+                // смога (сама механика смога завязана на уровень
+                // загрязнения в округе, отдельного "смогового" дефайна
+                // для этого не требуется). pollution - float 0..1
+                // (0% - 100% загрязнения тайла).
+                if (tile.pollution > 0f) return false;
+
+                // Доп. подстраховка на случай, если на тайле уже есть
+                // явный мутатор с намёком на загрязнение/смог
+                // (TileMutatorDef, 1.6/Odyssey) - читаем рефлексией, т.к.
+                // точное имя свойства-коллекции мутаторов на Tile не
+                // перепроверено вживую (см. шапку файла). Любая ошибка
+                // или отсутствие такого свойства просто ничего не
+                // отсеивает по этому признаку - основная защита уже
+                // сделана проверкой pollution выше.
+                if (HasPollutionMutator(tile)) return false;
+
                 float avgTemp = tile.temperature;
                 if (float.IsNaN(avgTemp)) return false;
                 if (avgTemp < MinAvgTemp || avgTemp > MaxAvgTemp) return false;
@@ -143,6 +198,40 @@ namespace BarbosinaStory
                 Log.Warning($"[BarbosinaStory] Ошибка при проверке тайла на пригодность: {e.Message}");
                 return false;
             }
+        }
+
+        // Ищет на тайле мутатор (TileMutatorDef, 1.6/Odyssey), чьё
+        // defName похож на "смог"/"загрязнение". Свойство-коллекция
+        // мутаторов на Tile достаётся рефлексией, т.к. точное имя не
+        // перепроверено вживую по декомпилу - при любой ошибке или
+        // отсутствии такого свойства просто возвращает false, ничего
+        // не роняя.
+        private static bool HasPollutionMutator(Tile tile)
+        {
+            try
+            {
+                PropertyInfo mutatorsProp = AccessTools.Property(typeof(Tile), "Mutators");
+                object mutatorsObj = mutatorsProp?.GetValue(tile);
+                if (!(mutatorsObj is System.Collections.IEnumerable mutators)) return false;
+
+                foreach (object mutator in mutators)
+                {
+                    string defName = (mutator as Def)?.defName;
+                    if (string.IsNullOrEmpty(defName)) continue;
+
+                    if (defName.IndexOf("Smog", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        defName.IndexOf("Pollut", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось проверить мутаторы тайла на загрязнение: {e.Message}");
+            }
+
+            return false;
         }
     }
 
@@ -328,6 +417,62 @@ namespace BarbosinaStory
             catch (Exception e)
             {
                 Log.Warning($"[BarbosinaStory] Не удалось автоматически пролистать страницу выбора места высадки: {e}. Тайл уже выбран правильно, нажмите \"Далее\" вручную.");
+            }
+        }
+    }
+
+    // Автоматически подтверждает любые Dialog_MessageBox-диалоги,
+    // всплывающие на визарде создания игры в нашем сценарии (например,
+    // предупреждение о близости к загрязнённым/кислотным тайлам на
+    // странице выбора места высадки). Строгий гвард обязателен: без
+    // него патч затронул бы ЛЮБОЕ подтверждающее окно в игре, включая
+    // обычный геймплей и другие сценарии.
+    [HarmonyPatch(typeof(Dialog_MessageBox), "PostOpen")]
+    public static class Patch_DialogMessageBox_AutoConfirm
+    {
+        public static void Postfix(object __instance)
+        {
+            try
+            {
+                if (Current.ProgramState != ProgramState.Entry) return;
+                if (Find.GameInitData == null) return;
+                if (!GameComponent_BarbosinaBugs.IsBarbosinaScenario()) return;
+                if (!(__instance is Dialog_MessageBox dialog)) return;
+
+                Action acceptAction = GetAction(dialog, "acceptAction") ?? GetAction(dialog, "buttonAAction");
+
+                if (acceptAction != null)
+                {
+                    acceptAction();
+                }
+                else
+                {
+                    Log.Warning("[BarbosinaStory] Не нашёл acceptAction/buttonAAction у Dialog_MessageBox через рефлексию - закрываю диалог без подтверждающего действия.");
+                }
+
+                dialog.Close(false);
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Ошибка в патче автоподтверждения диалогов на визарде создания игры: {e}");
+            }
+        }
+
+        // Достаёт из экземпляра диалога поле-делегат с заданным именем
+        // (пробуем и приватные, и публичные поля - AccessTools.Field
+        // ищет по всей иерархии типа независимо от модификатора
+        // доступа). Возвращает null, если поля нет или оно пустое.
+        private static Action GetAction(Dialog_MessageBox dialog, string fieldName)
+        {
+            try
+            {
+                FieldInfo field = AccessTools.Field(typeof(Dialog_MessageBox), fieldName);
+                return field?.GetValue(dialog) as Action;
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось прочитать поле {fieldName} у Dialog_MessageBox: {e.Message}");
+                return null;
             }
         }
     }
