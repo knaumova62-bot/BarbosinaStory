@@ -16,7 +16,7 @@ namespace BarbosinaStory
     // высадиться в океане, на леднике/морском льду или в экстремальной
     // пустыне, а также в зоне с неадекватной средней температурой.
     //
-    // Как это сделано (два патча):
+    // Как это сделано (четыре патча):
     //
     // 1) Patch_TileFinder_RandomStartingTile — Postfix на ванильный
     //    TileFinder.RandomStartingTile(). Этот метод и так уже умеет
@@ -37,19 +37,44 @@ namespace BarbosinaStory
     //    Page_SelectStartingSite.PreOpen(). Здесь мы сами проставляем
     //    Find.GameInitData.startingTile пригодным тайлом (через тот же
     //    TileFinder.RandomStartingTile(), уже отфильтрованный патчем
-    //    №1) и пытаемся программно пролистать страницу выбора места
-    //    высадки (Page.DoNext()) через рефлексию, чтобы игроку не
-    //    пришлось тыкать по карте руками. Если DoNext() через рефлексию
-    //    не находится или падает - не критично: тайл уже выбран
-    //    правильно, игроку останется только нажать "Далее" самому.
+    //    №1). PreOpen вызывается КАЖДЫЙ раз, когда страница попадает в
+    //    WindowStack - в том числе повторно, если игрок нажал "Назад"
+    //    со страницы настройки персонажей, - поэтому реролл тайла
+    //    срабатывает заново и при возврате. Больше ничего, кроме
+    //    простановки тайла, этот патч не делает: сам переход дальше
+    //    вынесен в патч №4, потому что вызывать Page.DoNext() прямо из
+    //    PreOpen ненадёжно (окно на этот момент ещё не встало в
+    //    WindowStack).
+    //
+    // 3) Patch_SelectStartingSite_CanDoNext — Prefix на
+    //    Page_SelectStartingSite.CanDoNext(). В нашем сценарии сразу
+    //    форсит __result = true и пропускает оригинальный метод (return
+    //    false), убирая диалог-подтверждение о близости к другим
+    //    фракциям и любые прочие блокирующие проверки на этой странице.
+    //    Вне нашего сценария не трогает ничего.
+    //
+    // 4) Patch_SelectStartingSite_PostOpen — Postfix на
+    //    Page_SelectStartingSite.PostOpen(). В отличие от PreOpen, этот
+    //    метод вызывается уже ПОСЛЕ того, как страница реально попала в
+    //    WindowStack, поэтому именно отсюда безопасно инициировать
+    //    переход на следующую страницу. Сам вызов CanDoNext()/DoNext()
+    //    откладывается через LongEventHandler.ExecuteWhenFinished (так
+    //    же поступают другие моды, патчащие этот метод), а сами методы
+    //    достаются рефлексией по фактическому типу страницы - если
+    //    что-то не находится или падает, тайл всё равно уже выбран
+    //    патчем №2, и игроку останется нажать "Далее" самому.
     //
     // ВАЖНО (см. README_BUILD.txt в этой же папке): этот файл написан
     // и вычитан по документации/декомпилированным исходникам 1.6, но
     // НЕ прогнан через реальную компиляцию с настоящими сборками игры
-    // (тут просто нет доступа к ним). Если что-то не соберётся -
-    // сборка dotnet build -c Release покажет точную ошибку (CS####),
-    // пришли её мне текстом - поправлю прицельно, а не гадая.
-    // Подозрительные места на этот случай:
+    // (тут просто нет доступа к ним). Патчи №3 и №4 резолвятся по
+    // строковому имени метода через Harmony/рефлексию, так что сами по
+    // себе они не дадут ошибку компиляции, даже если сигнатура
+    // CanDoNext/PostOpen в твоей сборке 1.6 будет другой - но тогда они
+    // тихо не сработают (см. лог: "не нашёл ... через рефлексию") и
+    // автопролистывание откатится на ручное. Если dotnet build выдаст
+    // ошибку CS#### именно по этому файлу - пришли её мне текстом,
+    // поправлю прицельно. Подозрительные места на этот случай:
     //   - Find.GameInitData.startingTile - имя поля стабильно из
     //     старых версий, но его ТИП в 1.6 сменился с int на PlanetTile;
     //     если у тебя вдруг всё ещё int - просто убери .Tile-обёртки
@@ -57,6 +82,11 @@ namespace BarbosinaStory
     //   - Page_SelectStartingSite - класс страницы выбора места
     //     высадки; если в 1.6 он переименован/убран - подскажет
     //     ошибка компиляции "не найден тип".
+    //   - CanDoNext()/PostOpen() - имена методов стабильны в известных
+    //     мне декомпилированных источниках 1.6, но если в логе игры при
+    //     старте будет "Patching exception... Method 'CanDoNext' not
+    //     found" (или PostOpen) - скинь точный текст ошибки и/или
+    //     сигнатуру метода из декомпилятора (dnSpy/ILSpy), поправлю.
     // ============================================================
 
     public static class BarbosinaTileFilter
@@ -169,7 +199,12 @@ namespace BarbosinaStory
 
     // Автоматически проставляет стартовый тайл при открытии страницы
     // выбора места высадки, чтобы игроку не пришлось тыкать по карте
-    // самому, и пытается сама пролистать эту страницу дальше.
+    // самому. PreOpen вызывается заново при каждом попадании страницы в
+    // WindowStack, в том числе при возврате назад со страницы настройки
+    // персонажей - поэтому реролл тайла происходит и при возврате тоже.
+    // Сам переход на следующую страницу сюда намеренно не добавлен (см.
+    // Patch_SelectStartingSite_PostOpen ниже) - на момент PreOpen окно
+    // ещё не встало в WindowStack, и вызов DoNext() отсюда ненадёжен.
     [HarmonyPatch(typeof(Page_SelectStartingSite), "PreOpen")]
     public static class Patch_SelectStartingSite_PreOpen
     {
@@ -192,26 +227,96 @@ namespace BarbosinaStory
                 {
                     Find.WorldInterface.SelectedTile = tile;
                 }
-
-                TryAutoAdvance((Page)__instance);
             }
             catch (Exception e)
             {
                 Log.Warning($"[BarbosinaStory] Не удалось автоматически выбрать стартовый тайл: {e}");
             }
         }
+    }
 
-        // Пытаемся сами пролистать страницу выбора места высадки, чтобы
-        // не заставлять игрока жать "Далее" руками. Метод внутренней
-        // навигации может отличаться от билда к билду, поэтому лезем
-        // через рефлексию по базовому классу Page и аккуратно
-        // откатываемся, если что-то не найдено - в этом случае тайл
-        // всё равно уже выбран правильно, и хватит одного клика "Далее".
+    // Убирает блокирующие диалоги/проверки на странице выбора места
+    // высадки (в первую очередь - подтверждение "это место отстоит от
+    // поселений других фракций всего на N или менее клеток, всё равно
+    // высадиться здесь?"), только в нашем сценарии. Работает как
+    // Prefix: если сценарий наш, сразу форсит __result = true и
+    // пропускает оригинальный CanDoNext() (return false из Prefix'а
+    // означает "не выполнять оригинальный метод"). Вне нашего сценария
+    // ничего не меняет - оригинальный CanDoNext() отрабатывает как
+    // обычно.
+    [HarmonyPatch(typeof(Page_SelectStartingSite), "CanDoNext")]
+    public static class Patch_SelectStartingSite_CanDoNext
+    {
+        public static bool Prefix(object __instance, ref bool __result)
+        {
+            try
+            {
+                if (!(__instance is Page_SelectStartingSite)) return true;
+                if (!GameComponent_BarbosinaBugs.IsBarbosinaScenario()) return true;
+
+                __result = true;
+                return false;
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Ошибка в патче CanDoNext страницы выбора места высадки, использую ванильную проверку: {e}");
+                return true;
+            }
+        }
+    }
+
+    // Надёжно пролистывает страницу выбора места высадки вперёд, только
+    // в нашем сценарии. В отличие от PreOpen, PostOpen вызывается уже
+    // ПОСЛЕ того, как страница реально попала в WindowStack - это
+    // безопасная точка, откуда можно инициировать переход дальше.
+    // Сам переход откладывается через LongEventHandler.ExecuteWhenFinished
+    // (тот же приём используют и другие моды, патчащие этот метод), а
+    // CanDoNext()/DoNext() достаются рефлексией по фактическому типу
+    // страницы. Если что-то не находится или падает - не критично: тайл
+    // уже выбран патчем Patch_SelectStartingSite_PreOpen, и игроку
+    // останется нажать "Далее" самому.
+    [HarmonyPatch(typeof(Page_SelectStartingSite), "PostOpen")]
+    public static class Patch_SelectStartingSite_PostOpen
+    {
+        public static void Postfix(object __instance)
+        {
+            try
+            {
+                if (!(__instance is Page_SelectStartingSite)) return;
+                if (!GameComponent_BarbosinaBugs.IsBarbosinaScenario()) return;
+                if (Find.GameInitData == null) return;
+
+                Page page = (Page)__instance;
+                LongEventHandler.ExecuteWhenFinished(() => TryAutoAdvance(page));
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"[BarbosinaStory] Не удалось запланировать автоматическое пролистывание страницы выбора места высадки: {e}");
+            }
+        }
+
+        // Дублирует то, что делает клик по кнопке "Далее": сначала
+        // спрашивает CanDoNext() (в нашем сценарии он уже форсирован в
+        // true патчем Patch_SelectStartingSite_CanDoNext, но на случай
+        // непредвиденной ещё одной блокирующей проверки честно
+        // уважаем false, а не долбим DoNext() силой) и только потом
+        // вызывает DoNext().
         private static void TryAutoAdvance(Page page)
         {
             try
             {
-                MethodInfo doNext = AccessTools.Method(typeof(Page), "DoNext");
+                MethodInfo canDoNext = AccessTools.Method(page.GetType(), "CanDoNext");
+                if (canDoNext != null)
+                {
+                    object canDoNextResult = canDoNext.Invoke(page, null);
+                    if (canDoNextResult is bool allowed && !allowed)
+                    {
+                        Log.Warning("[BarbosinaStory] CanDoNext() вернул false несмотря на патч - страницу выбора места высадки придётся пролистать вручную (\"Далее\").");
+                        return;
+                    }
+                }
+
+                MethodInfo doNext = AccessTools.Method(page.GetType(), "DoNext");
                 if (doNext != null)
                 {
                     doNext.Invoke(page, null);
@@ -223,45 +328,6 @@ namespace BarbosinaStory
             catch (Exception e)
             {
                 Log.Warning($"[BarbosinaStory] Не удалось автоматически пролистать страницу выбора места высадки: {e}. Тайл уже выбран правильно, нажмите \"Далее\" вручную.");
-            }
-        }
-    }
-
-    // ============================================================
-    // Отдельная проблема, не связанная с самим выбором тайла: пока
-    // игрок настраивает персонажей/идеологию и т.д., и даже пока идёт
-    // генерация локальной карты после "Начать!", RimWorld по умолчанию
-    // продолжает рисовать глобус на фоне (это ванильное поведение,
-    // просто раньше игрок не замечал, пока сам неспешно тыкал по карте
-    // мира). Раз мы теперь выбираем тайл автоматически и без паузы на
-    // разглядывание глобуса - глушим его отрисовку на всё время визарда
-    // создания игры, только для нашего сценария.
-    //
-    // Патчим WorldRendererUtility.WorldRendered - это единая точка,
-    // которую опрашивает и сама отрисовка слоёв глобуса, и остальные
-    // системы, решающие, показывать ли мир. Форсим false, только пока
-    // мы всё ещё в "мастере создания игры" (ProgramState.Entry,
-    // GameInitData уже существует) и сценарий - наш. На реальный
-    // геймплей (ProgramState.Playing, когда игрок сам открывает карту
-    // мира из колонии) это никак не влияет.
-    // ============================================================
-    [HarmonyPatch(typeof(WorldRendererUtility), "get_WorldRendered")]
-    public static class Patch_WorldRendererUtility_WorldRendered
-    {
-        public static void Postfix(ref bool __result)
-        {
-            try
-            {
-                if (!__result) return;
-                if (Current.ProgramState != ProgramState.Entry) return;
-                if (Find.GameInitData == null) return;
-                if (!GameComponent_BarbosinaBugs.IsBarbosinaScenario()) return;
-
-                __result = false;
-            }
-            catch (Exception e)
-            {
-                Log.Warning($"[BarbosinaStory] Ошибка в патче скрытия глобуса на визарде создания игры: {e}");
             }
         }
     }
